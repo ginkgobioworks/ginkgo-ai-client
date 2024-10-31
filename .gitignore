@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environment directories
+env/
+venv/
+ENV/
+.venv/
+.ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Log files
+*.log
+
+# Unit test / coverage reports
+*.coverage
+.coverage.*
+.cache
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE specific files
+.vscode/
+.idea/
+
+# NOTE(vz): Personal pattern for keeping a non-shared sandbox directory in projects
+_sandbox/

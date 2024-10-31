@@ -1,0 +1,19 @@
+# Changelog
+
+Major changes to `profound` are documented here.
+Version numbers for the project follow the conventions described in :pep:`440`
+and `Semantic versioning 2.0.0 <http://semver.org/>`\_, with the exceptions that:
+
+- versions below `1.0.0` will be numbered as `0.major.minor-or-patch`
+
+- versions above `1.0.0` will be numbered as `major.minor.patch`, as is
+  typical
+
+## 0.0.3 (2024-10-28)
+
+- Added UTR model and ESM
+- Added batch inference
+
+## 0.0.2 (2024-10-18)
+
+- First version, AAO only
