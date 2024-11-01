@@ -1,23 +1,26 @@
+"""In this example we compute embedding and run masked inference
+ on Ginkgo's AA0 protein language model."""
+
 from ginkgo_ai_client import (
     GinkgoAIClient,
-    three_utr_mean_embedding_params,
-    three_utr_masked_inference_params,
+    aa0_mean_embedding_params,
+    aa0_masked_inference_params,
 )
 
 client = GinkgoAIClient()
 
 # Simple query for embedding computation
-prediction = client.query(three_utr_mean_embedding_params("ATTGCG"))
+prediction = client.query(aa0_mean_embedding_params("ATTGCG"))
 # prediction["embedding"] == [1.05, -2.34, ...]
 
 
 # Simple query for masked inference
-prediction = client.query(three_utr_masked_inference_params("ATT<mask>TAC"))
+prediction = client.query(aa0_masked_inference_params("ATT<mask>TAC"))
 
 queries = [
-    three_utr_mean_embedding_params("AGCGC"),
-    three_utr_mean_embedding_params("ATTGCG"),
-    three_utr_mean_embedding_params("TACCGCA"),
+    aa0_mean_embedding_params("AGCGC"),
+    aa0_mean_embedding_params("ATTGCG"),
+    aa0_mean_embedding_params("TACCGCA"),
 ]
 predictions = client.batch_query(queries)
 

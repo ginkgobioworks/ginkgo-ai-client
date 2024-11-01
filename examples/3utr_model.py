@@ -1,4 +1,5 @@
-"""This runs embedding and masked inference queries on Ginkgo's 3'UTR language model."""
+"""In this example we compute embedding and run masked inference
+ on Ginkgo's 3'UTR language model."""
 
 from ginkgo_ai_client import (
     GinkgoAIClient,

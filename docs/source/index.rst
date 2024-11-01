@@ -23,6 +23,8 @@ Query Parameters
 .. automodule:: ginkgo_ai_client.query_parameters
    :members:
 
-.. .. toctree::
-..    :maxdepth: 2
-..    :caption: Contents:
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   examples
