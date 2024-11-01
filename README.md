@@ -62,7 +62,7 @@ predictions = client.batch_query([
 
 ## Available models
 
-See the [reference docs](https://github.com/ginkgobioworks/ginkgo-ai-client/index.html) for more details on usage and parameters.
+See the [example folder](examples/) and [reference docs](https://github.com/ginkgobioworks/ginkgo-ai-client/index.html) for more details on usage and parameters.
 
 | Model | Description                                 | Reference                                                                                    | Supported queries            | Versions |
 | ----- | ------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------- | -------- |
