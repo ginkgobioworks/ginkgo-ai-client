@@ -33,4 +33,4 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/build/  # Ensure this matches the output directory
+        publish_dir: ./docs/build/html/  # Ensure this matches the output directory
