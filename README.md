@@ -73,3 +73,7 @@ See the [example folder](examples/) and [reference docs](https://github.com/gink
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+# Releases
+
+Make sure the changelog is up to date, increment the version in pyproject.toml, create a new tag, then run the pubish action on that new tag (automation is coming soon).

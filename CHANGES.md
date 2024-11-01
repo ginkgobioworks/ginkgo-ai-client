@@ -9,6 +9,11 @@ and `Semantic versioning 2.0.0 <http://semver.org/>`\_, with the exceptions that
 - versions above `1.0.0` will be numbered as `major.minor.patch`, as is
   typical
 
+## 0.1.0 (2024-11-01)
+
+- First version for Github and release
+- Added documentation
+
 ## 0.0.3 (2024-10-28)
 
 - Added UTR model and ESM
