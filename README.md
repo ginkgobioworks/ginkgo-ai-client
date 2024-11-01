@@ -76,4 +76,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 # Releases
 
-Make sure the changelog is up to date, increment the version in pyproject.toml, create a new tag, then run the pubish action on that new tag (automation is coming soon).
+Make sure the changelog is up to date, increment the version in pyproject.toml, create a new tag, then create a release on Github (publication to PyPI is automated).
