@@ -7,7 +7,7 @@ Learn more in the [Model API announcement](https://www.ginkgobioworks.com/2024/0
 
 ## Prerequisites
 
-Register at https://models.ginkgobioworks.ai/ to get credits and an API KEY (of the form `b396553a-326a-4478-22eb-223e6ef9ee49`).
+Register at https://models.ginkgobioworks.ai/ to get credits and an API KEY (of the form `xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx`).
 Store the API KEY in the `GINKGOAI_API_KEY` environment variable.
 
 ## Installation
@@ -21,6 +21,8 @@ pip install ginkgo-ai-client
 ## Usage:
 
 **Note: This is an alpha version of the client and its interface may vary in the future.**
+
+**Example : masked inference with Ginkgo's AA0 model**
 
 The client requires an API key (and defaults to `os.environ.get("GINKGOAI_API_KEY")` if none is explicitly provided)
 
@@ -37,6 +39,25 @@ predictions = client.batch_query([
     aa0_masked_inference_params("MLLM<mask><mask>R"),
 ])
 # predictions[0]["result"]["sequence"] == "MPKYLRRL"
+```
+
+Note that you can get esm predictions by using `esm_masked_inference_params` in the example above.
+
+**Example : embedding computation with Ginkgo's 3'UTR language model**
+
+```python
+from ginkgo_ai_client import GinkgoAIClient, three_utr_mean_embedding_params
+
+client = GinkgoAIClient()
+prediction = client.query(three_utr_mean_embedding_params("MPKRRL"))
+# prediction["embedding"] == [1.05, -2.34, ...]
+
+predictions = client.batch_query([
+    three_utr_mean_embedding_params("MPKRRL"),
+    three_utr_mean_embedding_params("MRL"),
+    three_utr_mean_embedding_params("MLLMR"),
+])
+# predictions[0]["result"]["embedding"] == [1.05, -2.34, ...]
 ```
 
 ## Available models
