@@ -49,13 +49,13 @@ Note that you can get esm predictions by using `esm_masked_inference_params` in 
 from ginkgo_ai_client import GinkgoAIClient, three_utr_mean_embedding_params
 
 client = GinkgoAIClient()
-prediction = client.query(three_utr_mean_embedding_params("MPKRRL"))
+prediction = client.query(three_utr_mean_embedding_params("ATTGCG"))
 # prediction["embedding"] == [1.05, -2.34, ...]
 
 predictions = client.batch_query([
-    three_utr_mean_embedding_params("MPKRRL"),
-    three_utr_mean_embedding_params("MRL"),
-    three_utr_mean_embedding_params("MLLMR"),
+    three_utr_mean_embedding_params("ATTGCG"),
+    three_utr_mean_embedding_params("CAATGC"),
+    three_utr_mean_embedding_params("GCGCACATGT"),
 ])
 # predictions[0]["result"]["embedding"] == [1.05, -2.34, ...]
 ```
