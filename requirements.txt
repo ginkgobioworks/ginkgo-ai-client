@@ -1,4 +1,9 @@
-# Requirements for the docker image
+# Requirements for testing and doc building
 requests==2.32.3
 pytest-xdist==3.6.1
 pytest-cov==4.0.0
+
+sphinx==8.1.3,
+docutils==0.17.1,
+myst-parser==4.0.0,
+shibuya==2024.10.15

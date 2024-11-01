@@ -1,4 +1,4 @@
-# ginkgo-ai-client
+# Ginkgo's AI model API client
 
 **Work in progress: this repo was just made public and we are still working on integration**
 
@@ -62,7 +62,7 @@ predictions = client.batch_query([
 
 ## Available models
 
-See the reference docs for more details on usage and parameters
+See the [reference docs](https://github.com/ginkgobioworks/ginkgo-ai-client/index.html) for more details on usage and parameters.
 
 | Model | Description                                 | Reference                                                                                    | Supported queries            | Versions |
 | ----- | ------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------- | -------- |
