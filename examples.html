@@ -139,7 +139,7 @@ data-aria-dark="Switch to auto color mode">
 <section id="aa0-model">
 <h2>AA0 model<a class="headerlink" href="#aa0-model" title="Link to this heading">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;In this example we compute embedding and run masked inference</span>
-</span><span data-line="2"><span class="linenos"> 2</span><span class="sd"> on Ginkgo&#39;s AA0 protein language model.&quot;&quot;&quot;</span>
+</span><span data-line="2"><span class="linenos"> 2</span><span class="sd"> on the aa02 language model.&quot;&quot;&quot;</span>
 </span><span data-line="3"><span class="linenos"> 3</span>
 </span><span data-line="4"><span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="p">(</span>
 </span><span data-line="5"><span class="linenos"> 5</span>    <span class="n">GinkgoAIClient</span><span class="p">,</span>
@@ -150,17 +150,17 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="10"><span class="linenos">10</span><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
 </span><span data-line="11"><span class="linenos">11</span>
 </span><span data-line="12"><span class="linenos">12</span><span class="c1"># Simple query for embedding computation</span>
-</span><span data-line="13"><span class="linenos">13</span><span class="n">prediction</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">aa0_mean_embedding_params</span><span class="p">(</span><span class="s2">&quot;ATTGCG&quot;</span><span class="p">))</span>
+</span><span data-line="13"><span class="linenos">13</span><span class="n">prediction</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">aa0_mean_embedding_params</span><span class="p">(</span><span class="s2">&quot;MLYLRRL&quot;</span><span class="p">))</span>
 </span><span data-line="14"><span class="linenos">14</span><span class="c1"># prediction[&quot;embedding&quot;] == [1.05, -2.34, ...]</span>
 </span><span data-line="15"><span class="linenos">15</span>
 </span><span data-line="16"><span class="linenos">16</span>
 </span><span data-line="17"><span class="linenos">17</span><span class="c1"># Simple query for masked inference</span>
-</span><span data-line="18"><span class="linenos">18</span><span class="n">prediction</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">aa0_masked_inference_params</span><span class="p">(</span><span class="s2">&quot;ATT&lt;mask&gt;TAC&quot;</span><span class="p">))</span>
+</span><span data-line="18"><span class="linenos">18</span><span class="n">prediction</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">aa0_masked_inference_params</span><span class="p">(</span><span class="s2">&quot;MLY&lt;mask&gt;RRL&quot;</span><span class="p">))</span>
 </span><span data-line="19"><span class="linenos">19</span>
 </span><span data-line="20"><span class="linenos">20</span><span class="n">queries</span> <span class="o">=</span> <span class="p">[</span>
-</span><span data-line="21"><span class="linenos">21</span>    <span class="n">aa0_mean_embedding_params</span><span class="p">(</span><span class="s2">&quot;AGCGC&quot;</span><span class="p">),</span>
-</span><span data-line="22"><span class="linenos">22</span>    <span class="n">aa0_mean_embedding_params</span><span class="p">(</span><span class="s2">&quot;ATTGCG&quot;</span><span class="p">),</span>
-</span><span data-line="23"><span class="linenos">23</span>    <span class="n">aa0_mean_embedding_params</span><span class="p">(</span><span class="s2">&quot;TACCGCA&quot;</span><span class="p">),</span>
+</span><span data-line="21"><span class="linenos">21</span>    <span class="n">aa0_mean_embedding_params</span><span class="p">(</span><span class="s2">&quot;MLYLRRL&quot;</span><span class="p">),</span>
+</span><span data-line="22"><span class="linenos">22</span>    <span class="n">aa0_mean_embedding_params</span><span class="p">(</span><span class="s2">&quot;MLYRRL&quot;</span><span class="p">),</span>
+</span><span data-line="23"><span class="linenos">23</span>    <span class="n">aa0_mean_embedding_params</span><span class="p">(</span><span class="s2">&quot;MLYLLRRL&quot;</span><span class="p">),</span>
 </span><span data-line="24"><span class="linenos">24</span><span class="p">]</span>
 </span><span data-line="25"><span class="linenos">25</span><span class="n">predictions</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">batch_query</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
 </span><span data-line="26"><span class="linenos">26</span>
