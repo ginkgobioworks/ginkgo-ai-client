@@ -68,7 +68,7 @@ See the [example folder](examples/) and [reference docs](https://ginkgobioworks.
 | ----- | ------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------- | -------- |
 | ESM2  | Large Protein language model from Meta      | [Github](https://github.com/facebookresearch/esm?tab=readme-ov-file#esmfold)                 | Embeddings, masked inference | 3B, 650M |
 | AA0   | Ginkgo's proprietary protein language model | [Announcement](https://www.ginkgobioworks.com/2024/09/17/aa-0-protein-llm-technical-review/) | Embeddings, masked inference | 650M     |
-| 3UTR  | Ginkgo's proprietary 3'UTR language model   | [Preprint](https://www.biorxiv.org/content/10.1101/2024.10.07.616676v1)                      | Embeddings, masked inference | 650M     |
+| 3UTR  | Ginkgo's proprietary 3'UTR language model   | [Preprint](https://www.biorxiv.org/content/10.1101/2024.10.07.616676v1)                      | Embeddings, masked inference | v1       |
 
 ## License
 

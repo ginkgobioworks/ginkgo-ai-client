@@ -1,5 +1,5 @@
 """In this example we compute embedding and run masked inference
- on Ginkgo's AA0 protein language model."""
+ on the aa02 language model."""
 
 from ginkgo_ai_client import (
     GinkgoAIClient,
@@ -10,17 +10,17 @@ from ginkgo_ai_client import (
 client = GinkgoAIClient()
 
 # Simple query for embedding computation
-prediction = client.query(aa0_mean_embedding_params("ATTGCG"))
+prediction = client.query(aa0_mean_embedding_params("MLYLRRL"))
 # prediction["embedding"] == [1.05, -2.34, ...]
 
 
 # Simple query for masked inference
-prediction = client.query(aa0_masked_inference_params("ATT<mask>TAC"))
+prediction = client.query(aa0_masked_inference_params("MLY<mask>RRL"))
 
 queries = [
-    aa0_mean_embedding_params("AGCGC"),
-    aa0_mean_embedding_params("ATTGCG"),
-    aa0_mean_embedding_params("TACCGCA"),
+    aa0_mean_embedding_params("MLYLRRL"),
+    aa0_mean_embedding_params("MLYRRL"),
+    aa0_mean_embedding_params("MLYLLRRL"),
 ]
 predictions = client.batch_query(queries)
 
