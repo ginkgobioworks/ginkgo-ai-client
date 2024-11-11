@@ -2,6 +2,7 @@ import os
 import requests
 from typing import List, Dict, Optional
 import time
+import threading
 
 
 class GinkgoAIClient:
@@ -106,7 +107,7 @@ class GinkgoAIClient:
             else:
                 raise Exception(f"Unexpected response status: {poll_response}")
 
-    def batch_query(self, params_list: List[Dict], timeout: float = None) -> List[Dict]:
+    def batch_query(self, params_list: List[Dict], timeout: float = None, batch_size: int = 1000) -> List[Dict]:
         """Query the Ginkgo AI API in batch mode.
 
         Parameters
@@ -125,39 +126,75 @@ class GinkgoAIClient:
             The responses from the Ginkgo AI API. It will be different depending on the
             query, see the different docstrings in `ginkgo_ai_client.queries`.
         """
+
+        # Split params_list into batches of size batch_size
+        batched_params = [params_list[i:i + batch_size] for i in range(0, len(params_list), batch_size)]
         headers = {"x-api-key": self.api_key}
-        launch_response = requests.post(
-            self.BATCH_INFERENCE_URL, headers=headers, json={"requests": params_list}
-        )
-        if not launch_response.status_code == 200:
-            status_code, text = (launch_response.status_code, launch_response.text)
-            raise Exception(
-                f"Batch request failed with status code {status_code}: {text}"
+        ordered_job_ids = []
+        result_urls = []
+
+        for batch in batched_params:
+            launch_response = requests.post(
+                self.BATCH_INFERENCE_URL, headers=headers, json={"requests": batch}
             )
-        launch_response = launch_response.json()
-        assert ("result" in launch_response) and (
-            "?batchId" in launch_response["result"]
-        ), f"Unexpected response: {launch_response}"
-        ordered_job_ids = launch_response["jobIds"]
+            if not launch_response.status_code == 200:
+                status_code, text = (launch_response.status_code, launch_response.text)
+                raise Exception(
+                    f"Batch request failed with status code {status_code}: {text}"
+                )
+            launch_response = launch_response.json()
+            assert ("result" in launch_response) and (
+                "?batchId" in launch_response["result"]
+            ), f"Unexpected response: {launch_response}"
+            ordered_job_ids.extend(launch_response["jobIds"])
+            result_urls.append(launch_response["result"])
 
         # Poll until the job completes, an error occurs, or we time out.
         initial_time = time.time()
-        while True:
+        all_requests = []
+        incomplete_urls = set(result_urls)
+        
+        while incomplete_urls:
             time.sleep(self.polling_delay)
-            poll_response = requests.get(launch_response["result"], headers=headers)
-            assert poll_response.ok, f"Unexpected response: {poll_response}"
-            poll_response = poll_response.json()
-            if poll_response["status"] == "COMPLETE":
-                ordered_requests = sorted(
-                    poll_response["requests"],
-                    key=lambda x: ordered_job_ids.index(x["jobId"]),
-                )
-                return [r["result"][0] for r in ordered_requests]
-            elif poll_response["status"] in ["PENDING", "IN_PROGRESS"]:
-                if timeout is not None and (time.time() - initial_time > timeout):
-                    raise Exception(
-                        f"Timeout while waiting for batch_request to complete.\n"
-                        f"BatchId:{launch_response['batchId']}"
-                    )
-            else:
-                raise Exception(f"Unexpected response status: {poll_response}")
+            
+            # Create threads to poll all incomplete URLs in parallel
+            threads = []
+            responses = {}
+            
+            def poll_url(url):
+                response = requests.get(url, headers=headers)
+                assert response.ok, f"Unexpected response: {response}"
+                responses[url] = response.json()
+            
+            for url in incomplete_urls:
+                thread = threading.Thread(target=poll_url, args=(url,))
+                thread.start()
+                threads.append(thread)
+            
+            # Wait for all threads to complete
+            for thread in threads:
+                thread.join()
+            
+            # Process responses
+            urls_to_remove = set()
+            for url, poll_response in responses.items():
+                if poll_response["status"] == "COMPLETE":
+                    all_requests.extend(poll_response["requests"])
+                    urls_to_remove.add(url)
+                elif poll_response["status"] in ["PENDING", "IN_PROGRESS"]:
+                    if timeout is not None and (time.time() - initial_time > timeout):
+                        raise Exception(
+                            f"Timeout while waiting for batch_request to complete.\n"
+                            f"BatchId:{launch_response['batchId']}"
+                        )
+                else:
+                    raise Exception(f"Unexpected response status: {poll_response}")
+            
+            incomplete_urls -= urls_to_remove
+        
+        # Sort and return all results
+        ordered_requests = sorted(
+            all_requests,
+            key=lambda x: ordered_job_ids.index(x["jobId"]),
+        )
+        return [r["result"][0] for r in ordered_requests]
