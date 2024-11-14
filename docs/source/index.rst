@@ -6,25 +6,9 @@
 .. include:: ../../README.md
    :parser: myst_parser.sphinx_
 
-----
-
-API Documentation
------------------
-
-GinkgoAIClient
-~~~~~~~~~~~~~~
-
-.. automodule:: ginkgo_ai_client.client
-   :members:
-
-Query Parameters
-~~~~~~~~~~~~~~~~
-
-.. automodule:: ginkgo_ai_client.query_parameters
-   :members:
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   ref
    examples

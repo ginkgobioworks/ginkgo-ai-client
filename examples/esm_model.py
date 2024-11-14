@@ -3,25 +3,31 @@
 
 from ginkgo_ai_client import (
     GinkgoAIClient,
-    esm_mean_embedding_params,
-    esm_masked_inference_params,
+    MaskedInferenceQuery,
+    MeanEmbeddingQuery,
 )
 
 client = GinkgoAIClient()
+model = "esm2-650M"
 
-# Simple query for embedding computation
-prediction = client.query(esm_mean_embedding_params("MLYLRRL"))
-# prediction["embedding"] == [1.05, -2.34, ...]
+# SIMPLE QUERY FOR EMBEDDING COMPUTATION
+
+query = MeanEmbeddingQuery(sequence="MLYLRRL", model=model)
+prediction = client.send_request(query)
+# prediction.embedding == [1.05, -2.34, ...]
 
 
-# Simple query for masked inference
-prediction = client.query(esm_masked_inference_params("MLY<mask>RRL"))
+# SIMPLE QUERY FOR MASKED INFERENCE
+
+query = MaskedInferenceQuery(sequence="MLY<mask>RRL", model=model)
+prediction = client.send_request(query)
+# prediction.sequence == "MLYRRL"
+
+# BATCH REQUEST
 
 queries = [
-    esm_mean_embedding_params("MLYLRRL"),
-    esm_mean_embedding_params("MLYRRL"),
-    esm_mean_embedding_params("MLYLLRRL"),
+    MeanEmbeddingQuery(sequence=sequence, model=model)
+    for sequence in ["MLYLRRL", "MLL", "MLYLLRRL"]
 ]
-predictions = client.batch_query(queries)
-
-# predictions[0]["result"]["embedding"] == [1.05, -2.34, ...]
+predictions = client.send_batch_request(queries)
+# predictions[0].embedding == [1.05, -2.34, ...]
