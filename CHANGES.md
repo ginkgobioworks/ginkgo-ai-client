@@ -9,6 +9,10 @@ and `Semantic versioning 2.0.0 <http://semver.org/>`\_, with the exceptions that
 - versions above `1.0.0` will be numbered as `major.minor.patch`, as is
   typical
 
+# Unreleased
+
+Full API overhaul, now with class-based queries and responses.
+
 ## 0.1.0 (2024-11-01)
 
 - First version for Github and release

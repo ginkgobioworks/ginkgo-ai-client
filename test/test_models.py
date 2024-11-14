@@ -1,3 +1,5 @@
+import pytest
+
 from ginkgo_ai_client import (
     GinkgoAIClient,
     MaskedInferenceQuery,
@@ -5,25 +7,32 @@ from ginkgo_ai_client import (
 )
 
 
-### AA0 Model
-
-
-def test_AA0_masked_inference():
+@pytest.mark.parametrize(
+    "model, sequence, expected_sequence",
+    [
+        ("ginkgo-aa0-650M", "MCL<mask>YAFVATDA<mask>DDT", "MCLLYAFVATDADDDT"),
+        ("esm2-650M", "MCL<mask>YAFVATDA<mask>DDT", "MCLLYAFVATDAADDT"),
+        ("ginkgo-maskedlm-3utr-v1", "ATTG<mask>G", "ATTGGG"),
+    ],
+)
+def test_masked_inference(model, sequence, expected_sequence):
     client = GinkgoAIClient()
-    results = client.send_request(
-        MaskedInferenceQuery(
-            sequence="MCL<mask>YAFVATDA<mask>DDT", model="ginkgo-aa0-650M"
-        )
-    )
-    assert results.sequence == "MCLLYAFVATDADDDT"
+    results = client.send_request(MaskedInferenceQuery(sequence=sequence, model=model))
+    assert results.sequence == expected_sequence
 
 
-def test_AA0_embedding_inference():
+@pytest.mark.parametrize(
+    "model, sequence, expected_length",
+    [
+        ("ginkgo-aa0-650M", "MCLYAFVATDADDT", 1280),
+        ("esm2-650M", "MCLYAFVATDADDT", 1280),
+        ("ginkgo-maskedlm-3utr-v1", "ATTGGG", 768),
+    ],
+)
+def test_embedding_inference_query(model, sequence, expected_length):
     client = GinkgoAIClient()
-    results = client.send_request(
-        MeanEmbeddingQuery(sequence="MCLYAFVATDADDT", model="ginkgo-aa0-650M")
-    )
-    assert len(results.embedding) == 1280
+    results = client.send_request(MeanEmbeddingQuery(sequence=sequence, model=model))
+    assert len(results.embedding) == expected_length
 
 
 def test_batch_AA0_masked_inference():
@@ -34,37 +43,3 @@ def test_batch_AA0_masked_inference():
     ]
     results = client.send_batch_request(batch)
     assert [r.sequence for r in results] == ["MPP", "MRR", "MSS"]
-
-
-### ESM Model
-def test_esm_masked_inference():
-    client = GinkgoAIClient()
-    results = client.send_request(
-        MaskedInferenceQuery(sequence="MCL<mask>YAFVATDA<mask>DDT", model="esm2-650M")
-    )
-    assert results.sequence == "MCLLYAFVATDAADDT"
-
-
-def test_esm_embedding_inference():
-    client = GinkgoAIClient()
-    results = client.send_request(
-        MeanEmbeddingQuery(sequence="MCLYAFVATDADDT", model="esm2-650M")
-    )
-    assert len(results.embedding) == 1280
-
-
-# UTR model
-def test_utr_masked_inference():
-    client = GinkgoAIClient()
-    query = MaskedInferenceQuery(
-        sequence="ATTG<mask>G", model="ginkgo-maskedlm-3utr-v1"
-    )
-    results = client.send_request(query)
-    assert results.sequence == "ATTGGG"
-
-
-def test_utr_embedding_inference():
-    client = GinkgoAIClient()
-    query = MeanEmbeddingQuery(sequence="ATTGGG", model="ginkgo-maskedlm-3utr-v1")
-    results = client.send_request(query)
-    assert len(results.embedding) == 768
