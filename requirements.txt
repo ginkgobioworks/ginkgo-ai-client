@@ -1,5 +1,6 @@
 # Requirements for testing and doc building
 requests==2.32.3
+biopython==1.82.0
 pytest-xdist==3.6.1
 pytest-cov==4.0.0
 

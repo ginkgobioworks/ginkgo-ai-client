@@ -3,6 +3,7 @@
 from typing import Dict, Optional, Any, List
 import pydantic
 from abc import ABC, abstractmethod
+from Bio import SeqIO
 
 
 class QueryBase(pydantic.BaseModel, ABC):
@@ -109,6 +110,15 @@ class MeanEmbeddingQuery(QueryBase):
         sequence, model = query.sequence, query.model
         _validate_model_and_sequence(model=model, sequence=sequence, allow_masks=False)
         return query
+
+    @classmethod
+    def iter_from_fasta(cls, fasta_path: str, model: str):
+        for record in SeqIO.parse(fasta_path, "fasta"):
+            yield cls(sequence=str(record.seq), model=model, query_name=record.id)
+
+    @classmethod
+    def list_from_fasta(cls, fasta_path: str, model: str):
+        return list(cls.iter_from_fasta(fasta_path, model))
 
 
 class SequenceResponse(pydantic.BaseModel):
