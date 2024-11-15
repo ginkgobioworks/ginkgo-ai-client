@@ -12,7 +12,7 @@ output_folder = Path(__file__).parent / "outputs" / "large_batches"
 output_folder.mkdir(parents=True, exist_ok=True)
 
 client = GinkgoClient()
-queries = MeanEmbeddingQuery.iter_from_fasta(input_file)
+queries = MeanEmbeddingQuery.iter_from_fasta(input_file, model="ginkgo-aa0-650m")
 for batch_result in client.send_batched_requests(queries, batch_size=100):
     for query_result in batch_result:
         with open(output_folder / f"{query_result.query_name}.json", "w") as f:
