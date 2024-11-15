@@ -3,7 +3,7 @@
 from Bio import SeqIO
 from pathlib import Path
 import gzip
-from typing import Iterator
+from typing import Iterator, Union
 
 
 class IteratorWithLength(Iterator):
@@ -34,7 +34,7 @@ class IteratorWithLength(Iterator):
         return self._length
 
 
-def _fast_fasta_sequence_count(fasta_path: str | Path):
+def _fast_fasta_sequence_count(fasta_path: Union[str, Path]):
     """Count the number of sequences in a fasta file by counting the ">" lines."""
     if str(fasta_path).endswith(".gz"):
         with gzip.open(fasta_path, "rt") as f:
