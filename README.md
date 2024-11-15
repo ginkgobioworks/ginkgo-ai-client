@@ -57,9 +57,13 @@ from ginkgo_ai_client import GinkgoAIClient, MeanEmbeddingQuery
 client = GinkgoAIClient()
 model = "ginkgo-maskedlm-3utr-v1"
 
+# SINGLE QUERY
+
 query = MeanEmbeddingQuery(sequence="ATTGCG", model=model)
 prediction = client.send_request(query)
 # prediction.embedding == [1.05, -2.34, ...]
+
+# BATCH QUERY
 
 sequences = ["ATTGCG", "CAATGC", "GCGCACATGT"]
 queries = [MeanEmbeddingQuery(sequence=seq, model=model) for seq in sequences]
