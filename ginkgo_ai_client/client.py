@@ -277,21 +277,21 @@ class GinkgoAIClient:
     def send_requests_by_batches(
         self,
         queries: List[QueryBase] | Iterator[QueryBase],
-        batch_size: int,
+        batch_size: int = 20,
         timeout: float = None,
         on_failed_queries: Literal["ignore", "warn", "raise"] = "ignore",
         max_concurrent: int = 3,
         show_progress: bool = True,
     ):
         # Create batch iterator
-        if isinstance(queries, (list, tuple)):
-
-            batches = (
-                queries[i : i + batch_size] for i in range(0, len(queries), batch_size)
-            )
-            total = len(queries) // batch_size + (1 if len(queries) % batch_size else 0)
-        else:
-            batches = iter(lambda: list(itertools.islice(queries, batch_size)), [])
+        query_iterator = iter(queries)
+        batches = iter(lambda: list(itertools.islice(query_iterator, batch_size)), [])
+        try:
+            # will only work for lists or ranges() or iterators with a len() such as
+            # our IteratorWithLength which some of our utility methods return
+            n_queries = len(queries)
+            total = n_queries // batch_size + (1 if n_queries % batch_size else 0)
+        except Exception:
             total = None
 
         if show_progress:
@@ -305,7 +305,7 @@ class GinkgoAIClient:
             )
 
         for result in process_with_limited_concurrency(
-            elements=batches,
+            element_iterator=batches,
             function=send_batch,
             max_concurrent=max_concurrent,
             progress_bar=progress_bar,

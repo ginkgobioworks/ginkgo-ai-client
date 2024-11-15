@@ -1,9 +1,10 @@
 """Classes to define queries to the Ginkgo AI API."""
 
 from typing import Dict, Optional, Any, List
-import pydantic
 from abc import ABC, abstractmethod
-from Bio import SeqIO
+
+import pydantic
+from ginkgo_ai_client.utils import fasta_sequence_iterator, IteratorWithLength
 
 
 class QueryBase(pydantic.BaseModel, ABC):
@@ -113,8 +114,14 @@ class MeanEmbeddingQuery(QueryBase):
 
     @classmethod
     def iter_from_fasta(cls, fasta_path: str, model: str):
-        for record in SeqIO.parse(fasta_path, "fasta"):
-            yield cls(sequence=str(record.seq), model=model, query_name=record.id)
+        """Return an iterator over the sequences in a fasta file. The iterator has
+        a length attribute that gives the number of sequences in the fasta file."""
+        fasta_iterator = fasta_sequence_iterator(fasta_path)
+        query_iterator = (
+            cls(sequence=str(record.seq), model=model, query_name=record.id)
+            for record in fasta_iterator
+        )
+        return IteratorWithLength(query_iterator, len(fasta_iterator))
 
     @classmethod
     def list_from_fasta(cls, fasta_path: str, model: str):

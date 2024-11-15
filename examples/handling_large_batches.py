@@ -5,15 +5,16 @@ the outputs (here embeddings) to disk."""
 from pathlib import Path
 import json
 
-from ginkgo_ai_client import GinkgoClient, MeanEmbeddingQuery
+from ginkgo_ai_client import GinkgoAIClient, MeanEmbeddingQuery
 
-input_file = Path(__file__).parent / "data" / "input_sequences.fasta"
+input_file = Path(__file__).parent / "data" / "100_dna_sequences.fasta"
 output_folder = Path(__file__).parent / "outputs" / "large_batches"
 output_folder.mkdir(parents=True, exist_ok=True)
 
-client = GinkgoClient()
-queries = MeanEmbeddingQuery.iter_from_fasta(input_file, model="ginkgo-aa0-650m")
-for batch_result in client.send_batched_requests(queries, batch_size=100):
+client = GinkgoAIClient()
+model = "ginkgo-maskedlm-3utr-v1"
+queries = MeanEmbeddingQuery.iter_from_fasta(input_file, model=model)
+for batch_result in client.send_requests_by_batches(queries, batch_size=10):
     for query_result in batch_result:
         with open(output_folder / f"{query_result.query_name}.json", "w") as f:
-            json.dump(query_result.to_dict(), f)
+            json.dump(query_result.dict(), f)
