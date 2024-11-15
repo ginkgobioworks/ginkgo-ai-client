@@ -250,7 +250,12 @@ class GinkgoAIClient:
         while True:
             time.sleep(self.polling_delay)
             poll_response = requests.get(result_url, headers=headers)
-            assert poll_response.ok, f"Unexpected response: {poll_response}"
+            if not poll_response.ok:
+                cause = IOError(f"Unexpected response: {poll_response}")
+                raise RequestError(
+                    cause=cause,
+                    result_url=result_url,
+                )
             poll_response = poll_response.json()
             if poll_response["status"] == "COMPLETE":
                 return self._process_batch_request_results(

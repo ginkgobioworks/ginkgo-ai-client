@@ -1,0 +1,26 @@
+name: Release on Tag
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger only on tags that start with 'v'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }} # The name of the tag
+          release_name: Release ${{ github.ref_name }} # The name of the release
+          body: |
+            Automatically generated release for version ${{ github.ref_name }}.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
