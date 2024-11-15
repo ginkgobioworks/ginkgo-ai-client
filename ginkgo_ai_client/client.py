@@ -276,7 +276,7 @@ class GinkgoAIClient:
 
     def send_requests_by_batches(
         self,
-        queries: Union[List[QueryBase] | Iterator[QueryBase]],
+        queries: Union[List[QueryBase], Iterator[QueryBase]],
         batch_size: int = 20,
         timeout: float = None,
         on_failed_queries: Literal["ignore", "warn", "raise"] = "ignore",
