@@ -27,37 +27,48 @@ pip install ginkgo-ai-client
 The client requires an API key (and defaults to `os.environ.get("GINKGOAI_API_KEY")` if none is explicitly provided)
 
 ```python
-from ginkgo_ai_client import GinkgoAIClient, aa0_masked_inference_params
+from ginkgo_ai_client import GinkgoAIClient, MaskedInferenceQuery
 
 client = GinkgoAIClient()
-prediction = client.query(aa0_masked_inference_params("MPK<mask><mask>RRL"))
-# prediction["sequence"] == "MPKYLRRL"
+model = "ginkgo-aa0-650M"
 
-predictions = client.batch_query([
-    aa0_masked_inference_params("MPK<mask><mask>RRL"),
-    aa0_masked_inference_params("M<mask>RL"),
-    aa0_masked_inference_params("MLLM<mask><mask>R"),
-])
-# predictions[0]["result"]["sequence"] == "MPKYLRRL"
+# SINGLE QUERY
+
+query = MaskedInferenceQuery(sequence="MPK<mask><mask>RRL", model=model)
+prediction = client.send_request(query)
+# prediction.sequence == "MPKRRRRL"
+
+# BATCH QUERY
+
+sequences = ["MPK<mask><mask>RRL", "M<mask>RL", "MLLM<mask><mask>R"]
+queries = [MaskedInferenceQuery(sequence=seq, model=model) for seq in sequences]
+predictions = client.send_batch_request(queries)
+# predictions[0].sequence == "MPKRRRRL"
 ```
 
-Note that you can get esm predictions by using `esm_masked_inference_params` in the example above.
+Changing the `model` parameter to `esm2-650M` or `esm2-3b` in this example will perform
+masked inference with the ESM2 model.
 
 **Example : embedding computation with Ginkgo's 3'UTR language model**
 
 ```python
-from ginkgo_ai_client import GinkgoAIClient, three_utr_mean_embedding_params
+from ginkgo_ai_client import GinkgoAIClient, MeanEmbeddingQuery
 
 client = GinkgoAIClient()
-prediction = client.query(three_utr_mean_embedding_params("ATTGCG"))
-# prediction["embedding"] == [1.05, -2.34, ...]
+model = "ginkgo-maskedlm-3utr-v1"
 
-predictions = client.batch_query([
-    three_utr_mean_embedding_params("ATTGCG"),
-    three_utr_mean_embedding_params("CAATGC"),
-    three_utr_mean_embedding_params("GCGCACATGT"),
-])
-# predictions[0]["result"]["embedding"] == [1.05, -2.34, ...]
+# SINGLE QUERY
+
+query = MeanEmbeddingQuery(sequence="ATTGCG", model=model)
+prediction = client.send_request(query)
+# prediction.embedding == [1.05, -2.34, ...]
+
+# BATCH QUERY
+
+sequences = ["ATTGCG", "CAATGC", "GCGCACATGT"]
+queries = [MeanEmbeddingQuery(sequence=seq, model=model) for seq in sequences]
+predictions = client.send_batch_request(queries)
+# predictions[0].embedding == [1.05, -2.34, ...]
 ```
 
 ## Available models
@@ -74,6 +85,6 @@ See the [example folder](examples/) and [reference docs](https://ginkgobioworks.
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
 
-# Releases
+## Releases
 
 Make sure the changelog is up to date, increment the version in pyproject.toml, create a new tag, then create a release on Github (publication to PyPI is automated).

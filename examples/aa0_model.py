@@ -1,27 +1,33 @@
 """In this example we compute embedding and run masked inference
- on the aa02 language model."""
+ on the aa0 language model."""
 
 from ginkgo_ai_client import (
     GinkgoAIClient,
-    aa0_mean_embedding_params,
-    aa0_masked_inference_params,
+    MaskedInferenceQuery,
+    MeanEmbeddingQuery,
 )
 
 client = GinkgoAIClient()
+model = "ginkgo-aa0-650M"
 
-# Simple query for embedding computation
-prediction = client.query(aa0_mean_embedding_params("MLYLRRL"))
-# prediction["embedding"] == [1.05, -2.34, ...]
+# SIMPLE QUERY FOR EMBEDDING COMPUTATION
+
+query = MeanEmbeddingQuery(sequence="MLYLRRL", model=model)
+prediction = client.send_request(query)
+# prediction.embedding == [1.05, -2.34, ...]
 
 
-# Simple query for masked inference
-prediction = client.query(aa0_masked_inference_params("MLY<mask>RRL"))
+# SIMPLE QUERY FOR MASKED INFERENCE
+
+query = MaskedInferenceQuery(sequence="MLY<mask>RRL", model=model)
+prediction = client.send_request(query)
+# prediction.sequence == "MLYRRL"
+
+# BATCH REQUEST
 
 queries = [
-    aa0_mean_embedding_params("MLYLRRL"),
-    aa0_mean_embedding_params("MLYRRL"),
-    aa0_mean_embedding_params("MLYLLRRL"),
+    MeanEmbeddingQuery(sequence=sequence, model=model)
+    for sequence in ["MLYLRRL", "MLL", "MLYLLRRL"]
 ]
-predictions = client.batch_query(queries)
-
-# predictions[0]["result"]["embedding"] == [1.05, -2.34, ...]
+predictions = client.send_batch_request(queries)
+# predictions[0].embedding == [1.05, -2.34, ...]

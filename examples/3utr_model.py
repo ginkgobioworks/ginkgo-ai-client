@@ -3,25 +3,30 @@
 
 from ginkgo_ai_client import (
     GinkgoAIClient,
-    three_utr_mean_embedding_params,
-    three_utr_masked_inference_params,
+    MaskedInferenceQuery,
+    MeanEmbeddingQuery,
 )
 
 client = GinkgoAIClient()
+model = "ginkgo-maskedlm-3utr-v1"
 
-# Simple query for embedding computation
-prediction = client.query(three_utr_mean_embedding_params("ATTGCG"))
-# prediction["embedding"] == [1.05, -2.34, ...]
+# SIMPLE QUERY FOR EMBEDDING COMPUTATION
+
+query = MeanEmbeddingQuery(sequence="ATTGCG", model=model)
+prediction = client.send_request(query)
+# prediction.embedding == [1.05, -2.34, ...]
 
 
-# Simple query for masked inference
-prediction = client.query(three_utr_masked_inference_params("ATT<mask>TAC"))
+# SIMPLE QUERY FOR MASKED INFERENCE
+
+query = MaskedInferenceQuery(sequence="ATT<mask>TAC", model=model)
+prediction = client.send_request(query)
+
+# BATCH REQUEST
 
 queries = [
-    three_utr_mean_embedding_params("AGCGC"),
-    three_utr_mean_embedding_params("ATTGCG"),
-    three_utr_mean_embedding_params("TACCGCA"),
+    MeanEmbeddingQuery(sequence=sequence, model=model)
+    for sequence in ["AGCGC", "ATTGCG", "TACCGCA"]
 ]
-predictions = client.batch_query(queries)
-
-# predictions[0]["result"]["embedding"] == [1.05, -2.34, ...]
+predictions = client.send_batch_request(queries)
+# predictions[0].embedding == [1.05, -2.34, ...]

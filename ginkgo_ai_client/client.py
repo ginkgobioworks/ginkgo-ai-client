@@ -1,7 +1,51 @@
 import os
 import requests
-from typing import List, Dict, Optional
+from typing import List, Optional, Any, Literal, Dict
 import time
+import warnings
+
+from ginkgo_ai_client.queries import QueryBase
+
+
+class RequestError(Exception):
+    """An exception raised by a request, due to the query content or a system error.
+
+    This exception carries the original query and the result url to enable users to
+    better handle failure cases.
+
+    Parameters
+    ----------
+    cause: Exception
+        The original exception that caused the request to fail.
+
+    query: QueryBase (optional)
+        The query that failed. This enables users to retrieve and re-try the failed
+        queries in a batch query
+
+    result_url: str (optional)
+        The url where the result can be retrieved from. This enables users to get the
+        result later if the failure cause was a temporary network error or an
+        accidental timeout.
+    """
+
+    def __init__(
+        self,
+        cause: Exception,
+        query: Optional[QueryBase] = None,
+        result_url: Optional[str] = None,
+    ):
+        self.cause = cause
+        self.query = query
+        self.result_url = result_url
+
+    def _format_error_message(self):
+        cause_str = f"{self.cause.__class__.__name__}: {self.cause}"
+        url_str = (
+            f"\n\nThis happened while polling this url for results:\n{self.result_url}"
+            if self.result_url is not None
+            else ""
+        )
+        return f"{cause_str}\n on query: {self.query}{url_str}"
 
 
 class GinkgoAIClient:
@@ -23,10 +67,10 @@ class GinkgoAIClient:
 
 
         client = GinkgoAIClient()
-        query_params = aa0_masked_inference("MPK<mask><mask>RRL")
-        response = client.query(query_params)
+        query = MaskedInferenceQuery("MPK<mask><mask>RRL", model="ginkgo-aa0-650m")
+        response = client.send_request(query)
         # response["sequence"] == "MPKYLRRL"
-        responses = client.batch_query([query_params, other_query_params])
+        responses = client.send_batch_request([query_params, other_query_params])
 
     """
 
@@ -48,70 +92,94 @@ class GinkgoAIClient:
         self.api_key = api_key
         self.polling_delay = polling_delay
 
-    def query(
+    def send_request(
         self,
-        params: Dict,
+        query: QueryBase,
         timeout: float = 60,
-    ) -> Dict:
-        """
+    ) -> Any:
+        """Send a query to the Ginkgo AI API.
+
         Parameters
         ----------
-        params: dict
-            The parameters of the query (depends on the model used) used to send to the
-            Ginkgo AI API. These will typically be generated using the helper methods
-            ending in `*_params`.
+        query: QueryBase
+            The query to send to the Ginkgo AI API.
 
         timeout: float (default: 60)
             The maximum time to wait for the query to complete, in seconds.
 
         Returns
         -------
-        dict
+        Response
             The response from the Ginkgo AI API, for instance `{"sequence": "ATG..."}`.
             It will be different depending on the query, see the different docstrings
             of the helper methods ending in `*_params`.
+
+        Raises
+        ------
+        RequestError
+            If the request failed due to the query content or a system error. The
+            exception carries the original query and (if it reached that stage) the
+            url it was polling for the results.
         """
+
+        # LAUNCH THE REQUEST
+
         headers = {"x-api-key": self.api_key}
-        launch_response = requests.post(
-            self.INFERENCE_URL, headers=headers, json=params
-        )
+        json = query.to_request_params()
+        launch_response = requests.post(self.INFERENCE_URL, headers=headers, json=json)
         if not launch_response.ok:
             status_code, text = (launch_response.status_code, launch_response.text)
-            raise Exception(
-                f"Request failed with status code {status_code}: {text}. Request: {params}"
+            # TODO: add different error types depending on exception
+            cause = IOError(
+                f"Request failed at launch with status {status_code}: {text}."
             )
-        launch_response = launch_response.json()
-        assert ("result" in launch_response) and (
-            "?jobId" in launch_response["result"]
-        ), f"Unexpected response: {launch_response}"
+            raise RequestError(query=query, cause=cause)
 
-        # Poll until the job completes, an error occurs, or we time out.
-        initial_time = time.time()
+        # GET THE JOBID FROM THE RESPONSE
+
+        launch_response = launch_response.json()
+        response_has_result = "result" in launch_response
+        if not (response_has_result) and ("?jobId" in launch_response["result"]):
+            cause = IOError(f"Unexpected response format at launch: {launch_response}")
+            raise RequestError(query=query, cause=cause)
+        result_url = launch_response["result"]
+
+        # POLL UNTIL THE JOB COMPLETES, AN ERROR OCCURS, OR WE TIME OUT.
+
+        start_time = time.time()
         while True:
             time.sleep(self.polling_delay)
-            poll_response = requests.get(launch_response["result"], headers=headers)
+            poll_response = requests.get(result_url, headers=headers)
             assert poll_response.ok, f"Unexpected response: {poll_response}"
             poll_response = poll_response.json()
             if poll_response["status"] == "COMPLETE":
                 job_result = poll_response["result"][0]
                 if job_result["error"] is not None:
-                    raise IOError(f"Query returned an error: {job_result['error']}")
-                return poll_response["result"][0]["result"]
-            elif poll_response["status"] in ["PENDING", "IN_PROGRESS"]:
-                if time.time() - initial_time > timeout:
-                    raise Exception(
-                        f"Timeout while waiting for request to complete.\n"
-                        f"Request:{params}]\nJob:{launch_response}"
-                    )
-            else:
-                raise Exception(f"Unexpected response status: {poll_response}")
+                    cause = IOError(f"Query returned an error: {job_result['error']}")
+                    raise RequestError(query=query, cause=cause, result_url=result_url)
 
-    def batch_query(self, params_list: List[Dict], timeout: float = None) -> List[Dict]:
+                # If we reach this point, we have a result, let's parse it and return it.
+                response_result = poll_response["result"][0]["result"]
+                return query.parse_response(response_result)
+            elif poll_response["status"] in ["PENDING", "IN_PROGRESS"]:
+                if time.time() - start_time > timeout:
+                    cause = TimeoutError("Request timed out.")
+                    raise RequestError(query=query, cause=cause, result_url=result_url)
+            else:
+                cause = IOError(f"Unexpected response status: {poll_response}")
+                raise RequestError(query=query, cause=cause, result_url=result_url)
+
+    def send_batch_request(
+        self,
+        queries: List[QueryBase],
+        timeout: float = None,
+        on_failed_queries: Literal["ignore", "warn", "raise"] = "ignore",
+    ) -> List[Any]:
         """Query the Ginkgo AI API in batch mode.
 
         Parameters
         ----------
-        params_list: list of dict
+        queries: list of dict
             The parameters of the queries (depends on the model used) used to send to the
             Ginkgo AI API. These will typically be generated using the helper methods
             in `ginkgo_ai_client.queries`.
@@ -119,45 +187,127 @@ class GinkgoAIClient:
         timeout: float (optional)
             The maximum time to wait for the batch to complete, in seconds.
 
+        on_failed_queries: Literal["ignore", "warn", "raise"] = "ignore"
+            What to do if some queries fail. The default is to ignore the failures (the
+            user will have to check and handle the queries themselves). "warn" will print
+            a warning and return the failed queries, "raise" will raise an exception if
+            at least one query failed.
+
         Returns
         -------
-        list of dict
-            The responses from the Ginkgo AI API. It will be different depending on the
-            query, see the different docstrings in `ginkgo_ai_client.queries`.
+        responses : List[Any]
+            A list of responses from the Ginkgo AI API. the class of the responses
+            depends on the class of the queries. If some
+
+        Raises
+        ------
+        RequestException
+            If the request failed due to the query content or a system error.
+
+
+        Examples
+        --------
+
+        .. code-block:: python
+
+            client = GinkgoAIClient()
+            queries = [
+                MaskedInferenceQuery("MPK<mask><mask>RRL", model="ginkgo-aa0-650m"),
+                MaskedInferenceQuery("MES<mask><mask>YKL", model="ginkgo-aa0-650m")
+            ]
+            responses = client.send_batch_request(queries)
+
         """
+
+        # LAUNCH THE BATCH REQUEST
+
         headers = {"x-api-key": self.api_key}
+        request_params = [q.to_request_params() for q in queries]
         launch_response = requests.post(
-            self.BATCH_INFERENCE_URL, headers=headers, json={"requests": params_list}
+            self.BATCH_INFERENCE_URL, headers=headers, json={"requests": request_params}
         )
         if not launch_response.status_code == 200:
             status_code, text = (launch_response.status_code, launch_response.text)
-            raise Exception(
-                f"Batch request failed with status code {status_code}: {text}"
-            )
-        launch_response = launch_response.json()
-        assert ("result" in launch_response) and (
-            "?batchId" in launch_response["result"]
-        ), f"Unexpected response: {launch_response}"
-        ordered_job_ids = launch_response["jobIds"]
+            raise Exception(f"Batch request failed with status {status_code}: {text}")
 
-        # Poll until the job completes, an error occurs, or we time out.
-        initial_time = time.time()
+        # GET THE BATCHID FROM THE RESPONSE
+
+        launch_response = launch_response.json()
+        response_has_result = "result" in launch_response
+
+        if not response_has_result or "?batchId" not in launch_response["result"]:
+            raise Exception(f"Unexpected response: {launch_response}")
+        ordered_job_ids = launch_response["jobIds"]
+        result_url = launch_response["result"]
+
+        # POLL UNTIL THE BATCH COMPLETES, AN ERROR OCCURS, OR WE TIME OUT.
+
+        start_time = time.time()
         while True:
             time.sleep(self.polling_delay)
-            poll_response = requests.get(launch_response["result"], headers=headers)
-            assert poll_response.ok, f"Unexpected response: {poll_response}"
+            poll_response = requests.get(result_url, headers=headers)
+            if not poll_response.ok:
+                cause = IOError(f"Unexpected response: {poll_response}")
+                raise RequestError(
+                    cause=cause,
+                    result_url=result_url,
+                )
             poll_response = poll_response.json()
             if poll_response["status"] == "COMPLETE":
-                ordered_requests = sorted(
-                    poll_response["requests"],
-                    key=lambda x: ordered_job_ids.index(x["jobId"]),
+                return self._process_batch_request_results(
+                    queries=queries,
+                    ordered_job_ids=ordered_job_ids,
+                    response=poll_response,
+                    failed_queries_action=on_failed_queries,
                 )
-                return [r["result"][0] for r in ordered_requests]
             elif poll_response["status"] in ["PENDING", "IN_PROGRESS"]:
-                if timeout is not None and (time.time() - initial_time > timeout):
-                    raise Exception(
-                        f"Timeout while waiting for batch_request to complete.\n"
-                        f"BatchId:{launch_response['batchId']}"
+                if timeout is not None and (time.time() - start_time > timeout):
+                    cause = TimeoutError(f"Batch request took over {timeout} seconds.")
+                    raise RequestError(
+                        cause=cause,
+                        result_url=result_url,
                     )
             else:
                 raise Exception(f"Unexpected response status: {poll_response}")
+
+    @classmethod
+    def _process_batch_request_results(
+        cls,
+        queries: List[QueryBase],
+        ordered_job_ids: List[str],
+        response: Dict,
+        failed_queries_action: Literal["ignore", "warn", "raise"] = "ignore",
+    ) -> List[Any]:
+        # Technical note: to understand the parsing, one should know that the
+        # API returns a list of request results where each element is of the form
+        # {"jobId": "...", "result": [{"error": None, "result": ...}]}
+        ordered_results = sorted(
+            response["requests"],
+            key=lambda x: ordered_job_ids.index(x["jobId"]),
+        )
+
+        parsed_results = [
+            cls._parse_batch_request_result(query, request_result["result"][0])
+            for query, request_result in zip(queries, ordered_results)
+        ]
+
+        if failed_queries_action != "ignore":
+            errored_results = [r for r in parsed_results if isinstance(r, RequestError)]
+            n_errored = len(errored_results)
+            n_queries = len(queries)
+            if len(errored_results):
+                msg = f"{n_errored}/{n_queries} queries in the batch failed"
+                if failed_queries_action == "warn":
+                    warnings.warn(msg)
+                else:
+                    raise IOError(msg)
+        return parsed_results
+
+    @staticmethod
+    def _parse_batch_request_result(query: QueryBase, result: Dict) -> Any:
+        if result["error"] is not None:
+            return RequestError(
+                cause=Exception(result["error"]),
+                query=query,
+            )
+        return query.parse_response(result["result"])

@@ -13,10 +13,10 @@ authors = [
 ]
 
 dependencies = [
-    "google-cloud",
-    "hera",
+    "biopython",
+    "pydantic",
     "requests",
-    "rich"
+    "tqdm",
 ]
 
 [project.optional-dependencies]
