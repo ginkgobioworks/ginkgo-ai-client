@@ -87,4 +87,11 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## Releases
 
-Make sure the changelog is up to date, increment the version in pyproject.toml, create a new tag, then create a release on Github (publication to PyPI is automated).
+Make sure the changelog is up to date nd the top section reads `Unreleased`, increment the version with `bumpversion` and upload with tags:
+
+```
+bumpversion patch|minor|major
+git push && git push --tags
+```
+
+This should create a release on Github and publish to PyPI.
