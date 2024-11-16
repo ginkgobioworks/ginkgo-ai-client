@@ -2,25 +2,26 @@
 
 from typing import Dict, Optional, Any, List
 from abc import ABC, abstractmethod
-import inspect
 
 import pydantic
 
 
 class QueryBase(pydantic.BaseModel, ABC):
-
-    _example_params: str = "field_name=value, ..."
+    """Base class for all queries. It's functions are:
+    - Specify the mandatory class methods `to_request_params` and `parse_response`
+    - Provide a better error message when a user forgets to use named arguments only.
+      Without that tweak, the default error message from pydantic is very technical
+      and confusing to new users.
+    """
 
     def __new__(cls, *args, **kwargs):
         if args:
-            model_name = cls.__name__
-            example_params = cls._example_params
             raise TypeError(
-                f"Invalid initialization: {model_name} does "
-                f"not accept positional arguments. Please use keyword arguments instead "
-                f"for instance:\n\n {model_name}({example_params})."
+                f"Invalid initialization: {cls.__name__} does not accept unnamed "
+                f"arguments. Please name all inputs, for instance "
+                f"`{cls.__name__}(field_name=value, other_field=value, ...)`."
             )
-        return super().__new__(cls, **kwargs)
+        return super().__new__(cls)
 
     @abstractmethod
     def to_request_params(self) -> Dict:
@@ -105,8 +106,6 @@ class MeanEmbeddingQuery(QueryBase):
     sequence: str
     model: str
     query_name: Optional[str] = None
-
-    _example_params: str = "sequence='MLPP<mask>PPLM', model='ginkgo-aa0-650M'"
 
     def to_request_params(self) -> Dict:
         return {
