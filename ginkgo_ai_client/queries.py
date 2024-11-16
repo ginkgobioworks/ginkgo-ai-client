@@ -1,12 +1,26 @@
 """Classes to define queries to the Ginkgo AI API."""
 
 from typing import Dict, Optional, Any, List
-import pydantic
 from abc import ABC, abstractmethod
+import inspect
+
+import pydantic
 
 
 class QueryBase(pydantic.BaseModel, ABC):
-    query_name: Optional[str] = None
+
+    _example_params: str = "field_name=value, ..."
+
+    def __new__(cls, *args, **kwargs):
+        if args:
+            model_name = cls.__name__
+            example_params = cls._example_params
+            raise TypeError(
+                f"Invalid initialization: {model_name} does "
+                f"not accept positional arguments. Please use keyword arguments instead "
+                f"for instance:\n\n {model_name}({example_params})."
+            )
+        return super().__new__(cls, **kwargs)
 
     @abstractmethod
     def to_request_params(self) -> Dict:
@@ -91,6 +105,8 @@ class MeanEmbeddingQuery(QueryBase):
     sequence: str
     model: str
     query_name: Optional[str] = None
+
+    _example_params: str = "sequence='MLPP<mask>PPLM', model='ginkgo-aa0-650M'"
 
     def to_request_params(self) -> Dict:
         return {
