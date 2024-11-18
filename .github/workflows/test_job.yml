@@ -2,6 +2,10 @@ name: Test module
 
 on:
   workflow_call:
+    secrets:
+      GINKGOAI_API_KEY:
+        description: "Key for GinkgoAI API"
+        required: true
 
 permissions:
   contents: read
