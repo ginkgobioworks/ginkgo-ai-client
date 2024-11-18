@@ -87,11 +87,4 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## Releases
 
-Make sure the changelog is up to date nd the top section reads `Unreleased`, increment the version with `bumpversion` and upload with tags:
-
-```
-bumpversion patch|minor|major
-git push && git push --tags
-```
-
-This should create a release on Github and publish to PyPI.
+Make sure the changelog is up to date and the top section reads `Unreleased`. Increment the version with the `bumpversion` workflow in Actions - it will update the version everywhere in the repo, create a tag, and trigger a Github release. If all looks good, publish to PyPI via the `publish` workflow in Actions.
