@@ -24,3 +24,8 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish: # necessary as it doesn't get triggered by the release.
+    uses: ./.github/workflows/publish.yml
+    with:
+      python-version: "3.12"
