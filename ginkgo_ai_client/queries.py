@@ -4,11 +4,26 @@ from typing import Dict, Optional, Any, List
 from abc import ABC, abstractmethod
 
 import pydantic
+
 from ginkgo_ai_client.utils import fasta_sequence_iterator, IteratorWithLength
 
 
 class QueryBase(pydantic.BaseModel, ABC):
-    query_name: Optional[str] = None
+    """Base class for all queries. It's functions are:
+    - Specify the mandatory class methods `to_request_params` and `parse_response`
+    - Provide a better error message when a user forgets to use named arguments only.
+      Without that tweak, the default error message from pydantic is very technical
+      and confusing to new users.
+    """
+
+    def __new__(cls, *args, **kwargs):
+        if args:
+            raise TypeError(
+                f"Invalid initialization: {cls.__name__} does not accept unnamed "
+                f"arguments. Please name all inputs, for instance "
+                f"`{cls.__name__}(field_name=value, other_field=value, ...)`."
+            )
+        return super().__new__(cls)
 
     @abstractmethod
     def to_request_params(self) -> Dict:
