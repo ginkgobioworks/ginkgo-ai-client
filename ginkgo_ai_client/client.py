@@ -1,8 +1,12 @@
 import os
-import requests
-from typing import List, Optional, Any, Literal, Dict
+import itertools
+from typing import List, Optional, Any, Literal, Dict, Iterator, Union
 import time
 import warnings
+from concurrent import futures
+
+from tqdm import tqdm
+import requests
 
 from ginkgo_ai_client.queries import QueryBase
 
@@ -272,6 +276,44 @@ class GinkgoAIClient:
             else:
                 raise Exception(f"Unexpected response status: {poll_response}")
 
+    def send_requests_by_batches(
+        self,
+        queries: Union[List[QueryBase], Iterator[QueryBase]],
+        batch_size: int = 20,
+        timeout: float = None,
+        on_failed_queries: Literal["ignore", "warn", "raise"] = "ignore",
+        max_concurrent: int = 3,
+        show_progress: bool = True,
+    ):
+        # Create batch iterator
+        query_iterator = iter(queries)
+        batches = iter(lambda: list(itertools.islice(query_iterator, batch_size)), [])
+        try:
+            # will only work for lists or ranges() or iterators with a len() such as
+            # our IteratorWithLength which some of our utility methods return
+            n_queries = len(queries)
+            total = n_queries // batch_size + (1 if n_queries % batch_size else 0)
+        except Exception:
+            total = None
+
+        if show_progress:
+            progress_bar = tqdm(total=total, desc="Processing batches", mininterval=1)
+        else:
+            progress_bar = None
+
+        def send_batch(batch):
+            return self.send_batch_request(
+                queries=batch, timeout=timeout, on_failed_queries=on_failed_queries
+            )
+
+        for result in process_with_limited_concurrency(
+            element_iterator=batches,
+            function=send_batch,
+            max_concurrent=max_concurrent,
+            progress_bar=progress_bar,
+        ):
+            yield result
+
     @classmethod
     def _process_batch_request_results(
         cls,
@@ -313,3 +355,47 @@ class GinkgoAIClient:
                 query=query,
             )
         return query.parse_response(result["result"])
+
+
+def process_with_limited_concurrency(
+    element_iterator, function, max_concurrent: int, progress_bar: Optional = None
+):
+    with futures.ThreadPoolExecutor(max_workers=max_concurrent) as executor:
+
+        # Initialize active futures
+        active_futures = []
+
+        # Submit initial batch of futures up to max_concurrent
+        for _ in range(max_concurrent):
+            try:
+                element = next(element_iterator)
+                future = executor.submit(function, element)
+                active_futures.append(future)
+            except StopIteration:
+                break
+
+        # Process results and submit new batches as old ones complete
+        while active_futures:
+            # Wait for the first future to complete
+            FC = futures.FIRST_COMPLETED
+
+            completed, active_futures = (
+                futures.wait(active_futures, return_when=FC)[0],
+                list(futures.wait(active_futures, return_when=FC)[1]),
+            )
+
+            # Submit a new batch if there are any left
+            try:
+                element = next(element_iterator)
+                future = executor.submit(function, element)
+                active_futures.append(future)
+            except StopIteration:
+                pass
+
+            # Yield completed results and update progress
+            for future in completed:
+                yield future.result()
+                if progress_bar is not None:
+                    progress_bar.update(1)
+        if progress_bar is not None:
+            progress_bar.close()

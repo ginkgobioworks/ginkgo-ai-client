@@ -30,5 +30,8 @@ dist/
 .vscode/
 .idea/
 
+# examples
+examples/outputs/
+
 # NOTE(vz): Personal pattern for keeping a non-shared sandbox directory in projects
 _sandbox/
