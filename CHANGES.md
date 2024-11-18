@@ -9,6 +9,10 @@ and `Semantic versioning 2.0.0 <http://semver.org/>`\_, with the exceptions that
 - versions above `1.0.0` will be numbered as `major.minor.patch`, as is
   typical
 
+# Unreleased
+
+Fixing the github release pipeline
+
 # 0.3.0 (2024-11-18)
 
 Added support for promoter activity inference.
