@@ -1,4 +1,4 @@
-name: Bump Version, Tag, Release, and Publish
+name: Bump Version
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/test_job.yml
     with:
       python-version: "3.12"
 
@@ -65,27 +65,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  release:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        with:
-          tag_name: ${{ github.ref_name }} # The name of the tag
-          release_name: Release ${{ github.ref_name }} # The name of the release
-          body: |
-            Automatically generated release for version ${{ github.ref_name }}.
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  publish:
-    uses: ./.github/workflows/publish.yml
-    with:
-      python-version: "3.12"

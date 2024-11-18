@@ -1,4 +1,4 @@
-name: Release on Tag
+name: Release and publish on Tag
 
 on:
   push:
