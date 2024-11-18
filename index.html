@@ -212,12 +212,7 @@ masked inference with the ESM2 model.</p>
 </section>
 <section id="releases">
 <h2>Releases<a class="headerlink" href="#releases" title="Link to this heading">¶</a></h2>
-<p>Make sure the changelog is up to date nd the top section reads <code class="docutils literal notranslate"><span class="pre">Unreleased</span></code>, increment the version with <code class="docutils literal notranslate"><span class="pre">bumpversion</span></code> and upload with tags:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">bumpversion</span> <span class="n">patch</span><span class="o">|</span><span class="n">minor</span><span class="o">|</span><span class="n">major</span>
-</span><span data-line="2"><span class="n">git</span> <span class="n">push</span> <span class="o">&amp;&amp;</span> <span class="n">git</span> <span class="n">push</span> <span class="o">--</span><span class="n">tags</span>
-</span></pre></div>
-</div>
-<p>This should create a release on Github and publish to PyPI.</p>
+<p>Make sure the changelog is up to date and the top section reads <code class="docutils literal notranslate"><span class="pre">Unreleased</span></code>. Increment the version with the <code class="docutils literal notranslate"><span class="pre">bumpversion</span></code> workflow in Actions - it will update the version everywhere in the repo, create a tag, and trigger a Github release. If all looks good, publish to PyPI via the <code class="docutils literal notranslate"><span class="pre">publish</span></code> workflow in Actions.</p>
 </section>
 </section>
 <div class="toctree-wrapper compound">
