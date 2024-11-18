@@ -22,6 +22,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Configure Git
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -35,13 +41,12 @@ jobs:
 
       # Run bumpversion
       - name: Bump version
+        id: bump_version
         run: |
           bumpversion --allow-dirty ${{ github.event.inputs.version_type }}
-          NEW_VERSION=$(cat .bumpversion.cfg | grep current_version | cut -d'=' -f2 | tr -d ' ')
+          NEW_VERSION=$(git describe --tags --abbrev=0)
           echo "New version is $NEW_VERSION"
-        env:
-          GIT_AUTHOR_NAME: "github-actions[bot]"
-          GIT_AUTHOR_EMAIL: "github-actions[bot]@users.noreply.github.com"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       # Push changes and tag
       - name: Push changes and tag
@@ -53,8 +58,8 @@ jobs:
       - name: Create release
         uses: actions/create-release@v1
         with:
-          tag_name: v${{ steps.bump_version.outputs.NEW_VERSION }}
-          release_name: v${{ steps.bump_version.outputs.NEW_VERSION }}
+          tag_name: v${{ env.NEW_VERSION }}
+          release_name: v${{ env.NEW_VERSION }}
           draft: false
           prerelease: false
         env:
