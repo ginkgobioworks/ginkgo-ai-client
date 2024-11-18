@@ -5,7 +5,7 @@ from ginkgo_ai_client import GinkgoAIClient, MeanEmbeddingQuery
 from ginkgo_ai_client.queries import EmbeddingResponse
 from pathlib import Path
 
-FASTA_FILE = Path(__file__).parent / "data" / "test_batching" / "50_sequences.fasta"
+FASTA_FILE = Path(__file__).parent / "data" / "50_dna_sequences.fasta"
 model = "ginkgo-maskedlm-3utr-v1"
 
 

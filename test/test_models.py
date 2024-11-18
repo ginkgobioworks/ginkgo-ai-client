@@ -4,6 +4,7 @@ from ginkgo_ai_client import (
     GinkgoAIClient,
     MaskedInferenceQuery,
     MeanEmbeddingQuery,
+    PromoterActivityQuery,
 )
 
 
@@ -43,3 +44,19 @@ def test_batch_AA0_masked_inference():
     ]
     results = client.send_batch_request(batch)
     assert [r.sequence for r in results] == ["MPP", "MRR", "MSS"]
+
+
+def test_promoter_activity():
+    client = GinkgoAIClient()
+    query = PromoterActivityQuery(
+        promoter_sequence="tgccagccatctgttgtttgcc",
+        orf_sequence="GTCCCACTGATGAACTGTGCT",
+        tissue_of_interest={
+            "heart": ["CNhs10608+", "CNhs10612+"],
+            "liver": ["CNhs10608+", "CNhs10612+"],
+        },
+    )
+
+    response = client.send_request(query)
+    assert "heart" in response.activity_by_tissue
+    assert "liver" in response.activity_by_tissue
