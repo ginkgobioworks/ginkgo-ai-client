@@ -16,7 +16,6 @@ on:
 jobs:
   bump_version:
     runs-on: ubuntu-latest
-    needs: [test]
 
     steps:
       # Checkout the code
