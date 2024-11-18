@@ -37,6 +37,8 @@ class RequestError(Exception):
         self.cause = cause
         self.query = query
         self.result_url = result_url
+        message = self._format_error_message()
+        super().__init__(message)
 
     def _format_error_message(self):
         cause_str = f"{self.cause.__class__.__name__}: {self.cause}"
