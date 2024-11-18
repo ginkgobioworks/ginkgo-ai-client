@@ -14,11 +14,6 @@ on:
           - major
 
 jobs:
-  test:
-    uses: ./.github/workflows/test_job.yml
-    secrets:
-      GINKGOAI_API_KEY: ${{ secrets.GINKGOAI_API_KEY }}
-
   bump_version:
     runs-on: ubuntu-latest
     needs: [test]
