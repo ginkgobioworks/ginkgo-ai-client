@@ -181,7 +181,11 @@ class GinkgoAIClient:
         timeout: float = None,
         on_failed_queries: Literal["ignore", "warn", "raise"] = "ignore",
     ) -> List[Any]:
-        """Query the Ginkgo AI API in batch mode.
+        """Send multiple queries at once to the Ginkgo AI API in batch mode.
+
+        All the queries are sent at once and returned list has results in the same order
+        as the queries. Additionally, if the queries have a query_name attribute, it will
+        be preserved in the `query_name` attribute of the results.
 
         Parameters
         ----------
@@ -194,10 +198,11 @@ class GinkgoAIClient:
             The maximum time to wait for the batch to complete, in seconds.
 
         on_failed_queries: Literal["ignore", "warn", "raise"] = "ignore"
-            What to do if some queries fail. The default is to ignore the failures (the
-            user will have to check and handle the queries themselves). "warn" will print
-            a warning and return the failed queries, "raise" will raise an exception if
-            at least one query failed.
+            What to do if some queries fail. The default is to ignore the failures, they
+            will be returned as part of the results and will carry the corresponding
+            `query_name`. The user will have to check and handle the queries themselves.
+            "warn" will print a warning if there are failed queries, "raise" will raise
+            an exception if at least one query failed.
 
         Returns
         -------
@@ -285,6 +290,56 @@ class GinkgoAIClient:
         max_concurrent: int = 3,
         show_progress: bool = True,
     ):
+        """Send multiple queries at once to the Ginkgo AI API in batch mode.
+
+        This method is useful for sending large numbers of queries to the Ginkgo AI API
+        and process results in small batches as they are ready. It avoids running out of
+        RAM by holding thousands of requests and their results in memory, and avoids
+        overwhelming the web API servers.
+
+        The method divides the queries in small batches, then submits the batches to the
+        web API (only 3 batches are submitted at the same time by default), and returns
+        the list of results in each batch as soon as a full batch is ready.
+
+        **Important Warning**: this means that the batch results are not returned strictly
+        in the same order as the batches sent. The best way to attribute results to
+        inputs is to give each input query a `query_name` attribute, which will be
+        preserved in the `query_name` attribute of the results. This is done automatically
+        by some query methods such as `.iter_from_fasta()` which will attribute the
+        sequence name each query.
+
+        Examples
+        --------
+
+        .. code-block:: python
+
+            model="esm2-650m"
+            queries = MeanEmbeddingQuery.iter_from_fasta("sequences.fasta", model=model)
+                for batch_result in client.send_requests_by_batches(queries, batch_size=10):
+                     for query_result in batch_result:
+                          query_result.write_to_jsonl("results.jsonl")
+
+        Parameters
+        ----------
+
+        queries: Union[List[QueryBase], Iterator[QueryBase]]
+            The queries to send to the Ginkgo AI API. This can be a list or any iterable
+            or an iterator
+
+        batch_size: int (default: 20)
+            The size of the batches to send to the Ginkgo AI API.
+
+        timeout: float (optional)
+            The maximum time to wait for one batch to complete, in seconds.
+
+        on_failed_queries: Literal["ignore", "warn", "raise"] = "ignore"
+            What to do if some queries fail. The default is to ignore the failures, they
+            will be returned as part of the results and will carry the corresponding
+            `query_name`. The user will have to check and handle the queries themselves.
+            "warn" will print a warning if there are failed queries, "raise" will raise
+            an exception if at least one query failed.
+        """
+
         # Create batch iterator
         query_iterator = iter(queries)
         batches = iter(lambda: list(itertools.islice(query_iterator, batch_size)), [])
@@ -322,6 +377,7 @@ class GinkgoAIClient:
         response: Dict,
         failed_queries_action: Literal["ignore", "warn", "raise"] = "ignore",
     ) -> List[Any]:
+        """Apply parsing and error handling to the list of results of a batch request."""
         # Technical note: to understand the parsing, one should know that the
         # API returns a list of request results where each element is of the form
         # {"jobId": "...", "result": [{"error": None, "result": ...}]}
@@ -349,6 +405,7 @@ class GinkgoAIClient:
 
     @staticmethod
     def _parse_batch_request_result(query: QueryBase, result: Dict) -> Any:
+        """Parse the result of a single query from a batch request (output or error)."""
         if result["error"] is not None:
             return RequestError(
                 cause=Exception(result["error"]),
