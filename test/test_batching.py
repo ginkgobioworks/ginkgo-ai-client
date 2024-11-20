@@ -1,9 +1,11 @@
 """This file tests the batching functionality of the client, using short DNA sequences
 for which we'll compute embeddings."""
 
-from ginkgo_ai_client import GinkgoAIClient, MeanEmbeddingQuery
-from ginkgo_ai_client.queries import EmbeddingResponse
 from pathlib import Path
+import itertools
+from ginkgo_ai_client import GinkgoAIClient, MeanEmbeddingQuery, MaskedInferenceQuery
+from ginkgo_ai_client.queries import EmbeddingResponse
+
 
 FASTA_FILE = Path(__file__).parent / "data" / "50_dna_sequences.fasta"
 model = "ginkgo-maskedlm-3utr-v1"
@@ -17,6 +19,22 @@ def test_that_send_batch_request_works():
     results = client.send_batch_request(queries)
     assert len(results) == 50
     assert all(isinstance(r, EmbeddingResponse) for r in results)
+
+
+def test_that_batch_results_are_in_the_same_order_as_queries():
+    """We test that the results are consistent with the queries in the same order"""
+    client = GinkgoAIClient()
+    prefixes = ["".join(x) for x in itertools.product("ACGT", repeat=3)]
+    masked_sequences = [prefix + "<mask>" for prefix in prefixes]
+    model = "ginkgo-maskedlm-3utr-v1"
+    queries = [
+        MaskedInferenceQuery(sequence=seq, model=model, query_name=prefix)
+        for seq, prefix in zip(masked_sequences, prefixes)
+    ]
+    results = client.send_batch_request(queries)
+    for result, prefix in zip(results, prefixes):
+        assert result.query_name == prefix
+        assert result.sequence.startswith(prefix)
 
 
 def test_that_send_requests_by_batches_works():
