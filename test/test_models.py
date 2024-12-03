@@ -51,6 +51,7 @@ def test_promoter_activity():
     query = PromoterActivityQuery(
         promoter_sequence="tgccagccatctgttgtttgcc",
         orf_sequence="GTCCCACTGATGAACTGTGCT",
+        source="expression",
         tissue_of_interest={
             "heart": ["CNhs10608+", "CNhs10612+"],
             "liver": ["CNhs10608+", "CNhs10612+"],

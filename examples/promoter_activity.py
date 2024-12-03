@@ -14,6 +14,7 @@ promoter_sequence = "GTCCCACTGATGAACTGTGCT"
 query = PromoterActivityQuery(
     promoter_sequence=promoter_sequence,
     orf_sequence=orf_sequence,
+    source="expression",
     tissue_of_interest={
         "heart": ["CNhs10608+", "CNhs10612+"],
         "liver": ["CNhs10608+", "CNhs10612+"],
@@ -31,6 +32,7 @@ fasta_path = Path(__file__).parent / "data" / "100_dna_sequences.fasta"
 queries = PromoterActivityQuery.iter_with_promoter_from_fasta(
     fasta_path=fasta_path,
     orf_sequence=orf_sequence,
+    source="expression",
     tissue_of_interest={
         "heart": ["CNhs10608+", "CNhs10612+"],
         "liver": ["CNhs10608+", "CNhs10612+"],
