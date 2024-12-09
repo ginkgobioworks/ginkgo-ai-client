@@ -5,6 +5,7 @@ from ginkgo_ai_client import (
     MaskedInferenceQuery,
     MeanEmbeddingQuery,
     PromoterActivityQuery,
+    DiffusionMaskedQuery,
 )
 
 
@@ -14,6 +15,7 @@ from ginkgo_ai_client import (
         ("ginkgo-aa0-650M", "MCL<mask>YAFVATDA<mask>DDT", "MCLLYAFVATDADDDT"),
         ("esm2-650M", "MCL<mask>YAFVATDA<mask>DDT", "MCLLYAFVATDAADDT"),
         ("ginkgo-maskedlm-3utr-v1", "ATTG<mask>G", "ATTGGG"),
+        ("lcdna", "ATRGAyAtg<mask>TAC<mask>", "ATRGAyAtgTAC"),
     ],
 )
 def test_masked_inference(model, sequence, expected_sequence):
@@ -60,3 +62,17 @@ def test_promoter_activity():
     response = client.send_request(query)
     assert "heart" in response.activity_by_tissue
     assert "liver" in response.activity_by_tissue
+
+
+def test_diffusion_masked_inference():
+    client = GinkgoAIClient()
+    query = DiffusionMaskedQuery(
+        sequence="ATRGAyAtg<mask>TAC<mask>",  #upper and lower cases
+        model="lcdna",
+        temperature=0.5,
+        decoding_order_strategy="entropy",
+        unmaskings_per_step=2,
+    )
+    response = client.send_request(query)
+    assert isinstance(response.sequence, str)
+    assert "<mask>" not in response.sequence

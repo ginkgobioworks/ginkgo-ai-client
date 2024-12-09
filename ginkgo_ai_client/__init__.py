@@ -6,6 +6,8 @@ from .queries import (
     MaskedInferenceQuery,
     MeanEmbeddingQuery,
     PromoterActivityQuery,
+    DiffusionMaskedQuery,
+    DiffusionMaskedResponse,
 )
 
 __all__ = [
@@ -13,4 +15,5 @@ __all__ = [
     "MaskedInferenceQuery",
     "MeanEmbeddingQuery",
     "PromoterActivityQuery",
+    "DiffusionMaskedQuery",
 ]
