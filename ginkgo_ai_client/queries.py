@@ -48,6 +48,7 @@ _maskedlm_models_properties = {
     "esm2-3B": "protein",
     "ginkgo-maskedlm-3utr-v1": "dna",
     "lcdna": "nucleotide",
+    "abdiffusion": "protein",
 }
 
 _maskedlm_models_properties_str = "\n".join(

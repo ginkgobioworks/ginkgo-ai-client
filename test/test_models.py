@@ -63,12 +63,18 @@ def test_promoter_activity():
     assert "heart" in response.activity_by_tissue
     assert "liver" in response.activity_by_tissue
 
-
-def test_diffusion_masked_inference():
+@pytest.mark.parametrize(
+    "model, sequence, expected_sequence",
+    [
+        ("lcdna", "ATRGAyAtg<mask>TAC<mask>"),
+        ("abdiffusion", "MCL<mask>YAFVATDA<mask>DDT"),
+    ],
+)
+def test_diffusion_masked_inference(model, sequence):
     client = GinkgoAIClient()
     query = DiffusionMaskedQuery(
-        sequence="ATRGAyAtg<mask>TAC<mask>",  #upper and lower cases
-        model="lcdna",
+        sequence=sequence,  #upper and lower cases
+        model=model,
         temperature=0.5,
         decoding_order_strategy="entropy",
         unmaskings_per_step=2,
