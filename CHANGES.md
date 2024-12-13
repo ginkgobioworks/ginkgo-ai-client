@@ -9,7 +9,7 @@ and `Semantic versioning 2.0.0 <http://semver.org/>`\_, with the exceptions that
 - versions above `1.0.0` will be numbered as `major.minor.patch`, as is
   typical
 
-# Unreleased
+# 0.4.0 (2024-12-13)
 
 Added diffusion models
 
