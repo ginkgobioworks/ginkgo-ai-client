@@ -451,7 +451,7 @@ class DiffusionMaskedQuery(QueryBase):
 
     def parse_response(self, results: Dict) -> DiffusionMaskedResponse:
         return DiffusionMaskedResponse(
-            sequence=results["sequence"],
+            sequence=results["sequence"][0],
             query_name=self.query_name,
         )
 

@@ -15,7 +15,7 @@ from ginkgo_ai_client import (
         ("ginkgo-aa0-650M", "MCL<mask>YAFVATDA<mask>DDT", "MCLLYAFVATDADDDT"),
         ("esm2-650M", "MCL<mask>YAFVATDA<mask>DDT", "MCLLYAFVATDAADDT"),
         ("ginkgo-maskedlm-3utr-v1", "ATTG<mask>G", "ATTGGG"),
-        ("lcdna", "ATRGAyAtg<mask>TAC<mask>", "ATRGAyAtgTAC"),
+        ("lcdna", "ATRGAyAtg<mask>TAC<mask>", "atggatatgtta<unk>"),
     ],
 )
 def test_masked_inference(model, sequence, expected_sequence):
