@@ -47,6 +47,8 @@ _maskedlm_models_properties = {
     "esm2-650M": "protein",
     "esm2-3B": "protein",
     "ginkgo-maskedlm-3utr-v1": "dna",
+    "lcdna": "nucleotide",
+    "abdiffusion": "protein",
 }
 
 _maskedlm_models_properties_str = "\n".join(
@@ -67,6 +69,11 @@ def _validate_model_and_sequence(model, sequence: str, allow_masks=False):
         if not set(sequence).issubset({"A", "T", "G", "C"}):
             raise ValueError(
                 f"Model {model} requires the sequence to only contain ATGC characters"
+            )
+    elif sequence_type == "nucleotide":
+        if not set(sequence.lower()).issubset({"a", "t", "g", "c", "r", "y", "s", "w", "k", "m", "b", "d", "h", "v", "n"}):
+            raise ValueError(
+                f"Model {model} requires the sequence to only contain valid IUPAC nucleotide characters"
             )
     elif sequence_type == "protein":
         if not set(sequence).issubset(set("ACDEFGHIKLMNPQRSTVWY")):
@@ -381,3 +388,98 @@ class PromoterActivityQuery(QueryBase):
             model=model,
         )
         return list(iterator)
+
+
+class DiffusionMaskedResponse(ResponseBase):
+    """A response to a DiffusionMaskedQuery, with attributes `sequence` (the predicted
+    sequence) and `query_name` (the original query's name).
+    """
+
+    sequence: str
+    query_name: Optional[str] = None
+
+
+class DiffusionMaskedQuery(QueryBase):
+    """A query to perform masked sampling using a diffusion model.
+
+    Parameters
+    ----------
+    sequence: str
+        Input sequence for masked sampling. The sequence may contain "<mask>" tokens.
+    temperature: float, optional (default=0.5)
+        Sampling temperature, a value between 0 and 1.
+    decoding_order_strategy: str, optional (default="entropy")
+        Strategy for decoding order, must be either "max_prob" or "entropy".
+    unmaskings_per_step: int, optional (default=50)
+        Number of tokens to unmask per step, an integer between 1 and 1000.
+    model: str
+        The model to use for the inference.
+    query_name: Optional[str] = None
+        The name of the query. It will appear in the API response and can be used to handle exceptions.
+
+    Returns
+    -------
+    DiffusionMaskedResponse
+        ``client.send_request(query)`` returns a ``DiffusionMaskedResponse`` with attributes
+        ``sequence`` (the predicted sequence) and ``query_name`` (the original query's name).
+
+    Examples
+    --------
+    >>> query = DiffusionMaskedQuery(
+    ...     sequence="ATTG<mask>TAC",
+    ...     model="lcdna",
+    ...     temperature=0.7,
+    ...     decoding_order_strategy="entropy",
+    ...     unmaskings_per_step=20,
+    ... )
+    >>> client.send_request(query)
+    DiffusionMaskedResponse(sequence="ATTGCGTAC", query_name=None)
+    """
+
+    sequence: str
+    temperature: float = 0.5
+    decoding_order_strategy: str = "entropy"
+    unmaskings_per_step: int = 50
+    model: str
+    query_name: Optional[str] = None
+
+    def to_request_params(self) -> Dict:
+        data = {
+            "sequence": self.sequence,
+            "temperature": self.temperature,
+            "decoding_order_strategy": self.decoding_order_strategy,
+            "unmaskings_per_step": self.unmaskings_per_step,
+        }
+        return {
+            "model": self.model,
+            "text": json.dumps(data),
+            "transforms": [{"type": "DIFFUSION_GENERATE"}],
+        }
+
+    def parse_response(self, results: Dict) -> DiffusionMaskedResponse:
+        return DiffusionMaskedResponse(
+            sequence=results["sequence"][0],
+            query_name=self.query_name,
+        )
+
+    @pydantic.model_validator(mode="after")
+    def validate_query(cls, query):
+        sequence, model = query.sequence, query.model
+        # Validate sequence and model compatibility
+        _validate_model_and_sequence(
+            model=model,
+            sequence=sequence,
+            allow_masks=True,
+        )
+        # Validate temperature
+        if not 0 <= query.temperature <= 1:
+            raise ValueError("temperature must be between 0 and 1")
+        # Validate decoding_order_strategy
+        if query.decoding_order_strategy not in ["max_prob", "entropy"]:
+            raise ValueError(
+                "decoding_order_strategy must be 'max_prob' or 'entropy'"
+            )
+        # Validate unmaskings_per_step
+        if not 1 <= query.unmaskings_per_step <= 1000:
+            raise ValueError("unmaskings_per_step must be between 1 and 1000")
+        return query
