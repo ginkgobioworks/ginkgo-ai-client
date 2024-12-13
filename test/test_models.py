@@ -64,7 +64,7 @@ def test_promoter_activity():
     assert "liver" in response.activity_by_tissue
 
 @pytest.mark.parametrize(
-    "model, sequence, expected_sequence",
+    "model, sequence",
     [
         ("lcdna", "ATRGAyAtg<mask>TAC<mask>"),
         ("abdiffusion", "MCL<mask>YAFVATDA<mask>DDT"),
