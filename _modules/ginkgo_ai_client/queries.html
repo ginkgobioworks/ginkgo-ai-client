@@ -361,6 +361,8 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="244"><span class="c1">## ---- PROMOTER ACTIVITY QUERIES ---------------------------------------------------</span>
 </span><span data-line="245">
 </span><span data-line="246">
+<div class="viewcode-block" id="PromoterActivityResponse">
+<a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.PromoterActivityResponse">[docs]</a>
 </span><span data-line="247"><span class="k">class</span> <span class="nc">PromoterActivityResponse</span><span class="p">(</span><span class="n">ResponseBase</span><span class="p">):</span>
 </span><span data-line="248"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A response to a PromoterActivityQuery, with attributes `activity` (the predicted</span>
 </span><span data-line="249"><span class="sd">    activity) and `query_name` (the original query&#39;s name).</span>
@@ -375,9 +377,12 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="258"><span class="sd">    &quot;&quot;&quot;</span>
 </span><span data-line="259">
 </span><span data-line="260">    <span class="n">activity_by_tissue</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
-</span><span data-line="261">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="261">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 </span><span data-line="262">
 </span><span data-line="263">
+<div class="viewcode-block" id="PromoterActivityQuery">
+<a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.PromoterActivityQuery">[docs]</a>
 </span><span data-line="264"><span class="k">class</span> <span class="nc">PromoterActivityQuery</span><span class="p">(</span><span class="n">QueryBase</span><span class="p">):</span>
 </span><span data-line="265"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A query to infer the activity of a promoter in different tissues.</span>
 </span><span data-line="266">
@@ -517,21 +522,27 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="400">            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
 </span><span data-line="401">            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
 </span><span data-line="402">        <span class="p">)</span>
-</span><span data-line="403">        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span>
+</span><span data-line="403">        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span></div>
+
 </span><span data-line="404">
 </span><span data-line="405">
 </span><span data-line="406"><span class="c1">## ---- DIFFUSION QUERIES ---------------------------------------------------------</span>
 </span><span data-line="407">
 </span><span data-line="408">
+<div class="viewcode-block" id="DiffusionMaskedResponse">
+<a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.DiffusionMaskedResponse">[docs]</a>
 </span><span data-line="409"><span class="k">class</span> <span class="nc">DiffusionMaskedResponse</span><span class="p">(</span><span class="n">ResponseBase</span><span class="p">):</span>
 </span><span data-line="410"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A response to a DiffusionMaskedQuery, with attributes `sequence` (the predicted</span>
 </span><span data-line="411"><span class="sd">    sequence) and `query_name` (the original query&#39;s name).</span>
 </span><span data-line="412"><span class="sd">    &quot;&quot;&quot;</span>
 </span><span data-line="413">
 </span><span data-line="414">    <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="415">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="415">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 </span><span data-line="416">
 </span><span data-line="417">
+<div class="viewcode-block" id="DiffusionMaskedQuery">
+<a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.DiffusionMaskedQuery">[docs]</a>
 </span><span data-line="418"><span class="k">class</span> <span class="nc">DiffusionMaskedQuery</span><span class="p">(</span><span class="n">QueryBase</span><span class="p">):</span>
 </span><span data-line="419"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A query to perform masked sampling using a diffusion model.</span>
 </span><span data-line="420">
@@ -613,7 +624,8 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="496">        <span class="c1"># Validate unmaskings_per_step</span>
 </span><span data-line="497">        <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">query</span><span class="o">.</span><span class="n">unmaskings_per_step</span> <span class="o">&lt;=</span> <span class="mi">1000</span><span class="p">:</span>
 </span><span data-line="498">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unmaskings_per_step must be between 1 and 1000&quot;</span><span class="p">)</span>
-</span><span data-line="499">        <span class="k">return</span> <span class="n">query</span>
+</span><span data-line="499">        <span class="k">return</span> <span class="n">query</span></div>
+
 </span><span data-line="500">
 </span><span data-line="501">
 </span><span data-line="502"><span class="c1">## ---- STRUCTURE PREDICTION QUERIES ------------------------------------------------</span>
@@ -645,6 +657,8 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="528">    <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span>
 </span><span data-line="529">
 </span><span data-line="530">
+<div class="viewcode-block" id="BoltzStructurePredictionResponse">
+<a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.BoltzStructurePredictionResponse">[docs]</a>
 </span><span data-line="531"><span class="k">class</span> <span class="nc">BoltzStructurePredictionResponse</span><span class="p">(</span><span class="n">ResponseBase</span><span class="p">):</span>
 </span><span data-line="532"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A response to a BoltzStructurePredictionQuery</span>
 </span><span data-line="533">
@@ -687,9 +701,12 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="570">        <span class="k">else</span><span class="p">:</span>
 </span><span data-line="571">            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cif_file_url</span><span class="p">)</span>
 </span><span data-line="572">            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span data-line="573">                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</span><span data-line="573">                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span></div>
+
 </span><span data-line="574">
 </span><span data-line="575">
+<div class="viewcode-block" id="BoltzStructurePredictionQuery">
+<a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.BoltzStructurePredictionQuery">[docs]</a>
 </span><span data-line="576"><span class="k">class</span> <span class="nc">BoltzStructurePredictionQuery</span><span class="p">(</span><span class="n">QueryBase</span><span class="p">):</span>
 </span><span data-line="577"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A query to predict the structure of a protein using the Boltz model.</span>
 </span><span data-line="578">
@@ -747,7 +764,8 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="630">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
 </span><span data-line="631">            <span class="n">sequences</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;protein&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">}}],</span>
 </span><span data-line="632">            <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">,</span>
-</span><span data-line="633">        <span class="p">)</span>
+</span><span data-line="633">        <span class="p">)</span></div>
+
 </span></pre></div>
         </article><button class="back-to-top" type="button">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
