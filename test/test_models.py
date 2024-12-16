@@ -79,10 +79,10 @@ def test_promoter_activity_fails_with_invalid_framework_name():
                 "heart": ["CNhs10608+", "CNhs10612+"],
                 "liver": ["CNhs10608+", "CNhs10612+"],
             },
-            inference_framework="promoter-1"  # invalid framework
+            inference_framework="promoter-2"  # invalid framework
         )
     
-    assert "Input should be 'promoter-0'" in str(exc_info.value)
+    assert "Input should be 'promoter-0' " in str(exc_info.value)
     assert "type=literal_error" in str(exc_info.value)
 
 @pytest.mark.parametrize(
