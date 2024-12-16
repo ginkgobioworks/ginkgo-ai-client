@@ -67,7 +67,7 @@ def test_promoter_activity():
     assert "heart" in response.activity_by_tissue
     assert "liver" in response.activity_by_tissue
 
-def test_promoter_activity_invalid_framework():
+def test_promoter_activity_fails_with_invalid_framework_name():
     client = GinkgoAIClient()
     
     with pytest.raises(ValidationError) as exc_info:

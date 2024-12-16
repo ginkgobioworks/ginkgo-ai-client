@@ -299,7 +299,6 @@ class PromoterActivityQuery(QueryBase):
 
     def to_request_params(self) -> Dict:
         # TODO: update the web API so the conversion isn't necessary
-        model_name = f"borzoi-{self.borzoi_model}"
         data = {
             "prom": self.promoter_sequence,
             "orf": self.orf_sequence,
@@ -307,7 +306,7 @@ class PromoterActivityQuery(QueryBase):
             "source": self.source,
         }
         return {
-            "model": model_name,
+            "model": f"borzoi-{self.borzoi_model}",
             "text": json.dumps(data),
             "transforms": [{"type": "PROMOTER_ACTIVITY"}],
         }
