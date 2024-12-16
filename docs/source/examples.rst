@@ -21,3 +21,12 @@ AA0 model
 .. literalinclude:: ../../examples/3utr_model.py
    :language: python
    :linenos:
+
+
+
+Boltz structure inference
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. literalinclude:: ../../examples/boltz_structure_inference/gfp.py
+   :language: python
+   :linenos:

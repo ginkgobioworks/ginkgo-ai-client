@@ -1,3 +1,5 @@
+"""Simple example where we predict the 3D structure of the GFP protein."""
+
 from ginkgo_ai_client import GinkgoAIClient, BoltzStructurePredictionQuery
 
 client = GinkgoAIClient()
