@@ -93,7 +93,7 @@ def test_boltz_structure_prediction():
     client = GinkgoAIClient()
     data_file = Path(__file__).parent / "data" / "boltz_input_single_chain.yaml"
     query = BoltzStructurePredictionQuery.from_yaml_file(data_file)
-    response = client.send_request(query)
+    response = client.send_request(query, timeout=1000)
     with tempfile.TemporaryDirectory() as temp_dir:
         response.download_structure(Path(temp_dir) / "structure.cif")
         response.download_structure(Path(temp_dir) / "structure.pdb")
