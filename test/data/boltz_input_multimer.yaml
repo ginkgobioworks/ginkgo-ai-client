@@ -1,0 +1,8 @@
+version: 1  # Optional, defaults to 1
+sequences:
+  - protein:
+      id: A
+      sequence: MAHHHHHHVAVDAVSFTLLQDQLQSVLDTL
+  - protein:
+      id: B
+      sequence: MRYAFAAEATTCNAFWRNVDMTVTALYEVPLGVCTQDPDRW
