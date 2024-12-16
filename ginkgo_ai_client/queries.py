@@ -276,9 +276,11 @@ class PromoterActivityQuery(QueryBase):
     query_name: Optional[str] = None
         The name of the query. It will appear in the API response and can be used to
         handle exceptions.
-    model: str = "borzoi-human-fold0"
-        The model to use for the inference (only one default model is supported for now).
-
+    inference_framework: Literal["promote-0"] = "promote-0"
+        The inference framework to use for the inference. Currently only supports 
+    borzoi_model: Literal["human-fold0"] = "human-fold0"
+        The model to use for the inference. Currently only supports the trained 
+        model of "human-fold0".
     Returns
     -------
     PromoterActivityResponse
@@ -291,11 +293,13 @@ class PromoterActivityQuery(QueryBase):
     orf_sequence: str
     tissue_of_interest: Dict[str, List[str]]
     source: str
-    model: str = "borzoi-human-fold0"
+    inference_framework: Literal["promote-0"] = "promote-0"
+    borzoi_model: Literal["human-fold0"] = "human-fold0"
     query_name: Optional[str] = None
 
     def to_request_params(self) -> Dict:
         # TODO: update the web API so the conversion isn't necessary
+        model_name = f"borzoi-{self.borzoi_model}"
         data = {
             "prom": self.promoter_sequence,
             "orf": self.orf_sequence,
@@ -303,7 +307,7 @@ class PromoterActivityQuery(QueryBase):
             "source": self.source,
         }
         return {
-            "model": self.model,
+            "model": model_name,
             "text": json.dumps(data),
             "transforms": [{"type": "PROMOTER_ACTIVITY"}],
         }

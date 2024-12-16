@@ -10,7 +10,7 @@ from ginkgo_ai_client import (
     DiffusionMaskedQuery,
     BoltzStructurePredictionQuery,
 )
-
+from pydantic_core import ValidationError
 
 @pytest.mark.parametrize(
     "model, sequence, expected_sequence",
@@ -67,6 +67,23 @@ def test_promoter_activity():
     assert "heart" in response.activity_by_tissue
     assert "liver" in response.activity_by_tissue
 
+def test_promoter_activity_invalid_framework():
+    client = GinkgoAIClient()
+    
+    with pytest.raises(ValidationError) as exc_info:
+        query = PromoterActivityQuery(
+            promoter_sequence="tgccagccatctgttgtttgcc",
+            orf_sequence="GTCCCACTGATGAACTGTGCT",
+            source="expression",
+            tissue_of_interest={
+                "heart": ["CNhs10608+", "CNhs10612+"],
+                "liver": ["CNhs10608+", "CNhs10612+"],
+            },
+            inference_framework="promoter-1"  # invalid framework
+        )
+    
+    assert "Input should be 'promote-0'" in str(exc_info.value)
+    assert "type=literal_error" in str(exc_info.value)
 
 @pytest.mark.parametrize(
     "model, sequence",
