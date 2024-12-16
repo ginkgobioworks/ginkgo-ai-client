@@ -17,6 +17,7 @@ dependencies = [
     "pydantic",
     "requests",
     "tqdm",
+    "pyyaml",
 ]
 
 [project.optional-dependencies]

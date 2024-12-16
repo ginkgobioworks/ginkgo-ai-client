@@ -1,3 +1,5 @@
+import tempfile
+from pathlib import Path
 import pytest
 
 from ginkgo_ai_client import (
@@ -6,6 +8,7 @@ from ginkgo_ai_client import (
     MeanEmbeddingQuery,
     PromoterActivityQuery,
     DiffusionMaskedQuery,
+    BoltzStructurePredictionQuery,
 )
 
 
@@ -64,6 +67,7 @@ def test_promoter_activity():
     assert "heart" in response.activity_by_tissue
     assert "liver" in response.activity_by_tissue
 
+
 @pytest.mark.parametrize(
     "model, sequence",
     [
@@ -74,7 +78,7 @@ def test_promoter_activity():
 def test_diffusion_masked_inference(model, sequence):
     client = GinkgoAIClient()
     query = DiffusionMaskedQuery(
-        sequence=sequence,  #upper and lower cases
+        sequence=sequence,  # upper and lower cases
         model=model,
         temperature=0.5,
         decoding_order_strategy="entropy",
@@ -83,3 +87,13 @@ def test_diffusion_masked_inference(model, sequence):
     response = client.send_request(query)
     assert isinstance(response.sequence, str)
     assert "<mask>" not in response.sequence
+
+
+def test_boltz_structure_prediction():
+    client = GinkgoAIClient()
+    data_file = Path(__file__).parent / "data" / "boltz_input_single_chain.yaml"
+    query = BoltzStructurePredictionQuery.from_yaml_file(data_file)
+    response = client.send_request(query)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        response.download_structure(Path(temp_dir) / "structure.cif")
+        response.download_structure(Path(temp_dir) / "structure.pdb")

@@ -1,9 +1,12 @@
 """Utility functions for building queries, batches, etc."""
 
-from Bio import SeqIO
 from pathlib import Path
 import gzip
 from typing import Iterator, Union
+
+
+from Bio import SeqIO
+from Bio.PDB import MMCIFParser, PDBIO
 
 
 class IteratorWithLength(Iterator):
@@ -50,3 +53,12 @@ def fasta_sequence_iterator(fasta_path: str):
     # compute the number of sequences in the fasta file by counting ">"
     length = _fast_fasta_sequence_count(fasta_path)
     return IteratorWithLength(SeqIO.parse(fasta_path, "fasta"), length)
+
+
+def cif_to_pdb(cif_path: Union[str, Path], pdb_path: Union[str, Path]):
+    """Convert a cif file to a pdb file."""
+    parser = MMCIFParser(QUIET=True)
+    structure = parser.get_structure(cif_path.stem, cif_path)
+    io = PDBIO()
+    io.set_structure(structure)
+    io.save(str(pdb_path))
