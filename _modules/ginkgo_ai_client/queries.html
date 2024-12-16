@@ -407,7 +407,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="290">    <span class="n">promoter_sequence</span><span class="p">:</span> <span class="nb">str</span>
 </span><span data-line="291">    <span class="n">orf_sequence</span><span class="p">:</span> <span class="nb">str</span>
 </span><span data-line="292">    <span class="n">tissue_of_interest</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-</span><span data-line="293">    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> 
+</span><span data-line="293">    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
 </span><span data-line="294">    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;borzoi-human-fold0&quot;</span>
 </span><span data-line="295">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span data-line="296">
@@ -702,41 +702,52 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="585"><span class="sd">    query_name: Optional[str] = None</span>
 </span><span data-line="586"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
 </span><span data-line="587"><span class="sd">        handle exceptions.</span>
-</span><span data-line="588"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span data-line="589">
-</span><span data-line="590">    <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;protein&quot;</span><span class="p">,</span> <span class="s2">&quot;ligand&quot;</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">_Protein</span><span class="p">,</span> <span class="n">_CCD</span><span class="p">,</span> <span class="n">_Smiles</span><span class="p">]]]</span>
-</span><span data-line="591">    <span class="n">model</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;boltz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;boltz&quot;</span>
-</span><span data-line="592">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="588">
+</span><span data-line="589"><span class="sd">    Examples</span>
+</span><span data-line="590"><span class="sd">    --------</span>
+</span><span data-line="591">
+</span><span data-line="592"><span class="sd">    .. code:: python</span>
 </span><span data-line="593">
-</span><span data-line="594">    <span class="k">def</span> <span class="nf">to_request_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-</span><span data-line="595">        <span class="k">return</span> <span class="p">{</span>
-</span><span data-line="596">            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;boltz&quot;</span><span class="p">,</span>
-</span><span data-line="597">            <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;INFER_STRUCTURE&quot;</span><span class="p">}],</span>
-</span><span data-line="598">            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;query_name&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">),</span>
-</span><span data-line="599">        <span class="p">}</span>
+</span><span data-line="594"><span class="sd">        query = BoltzStructurePredictionQuery.from_yaml_file(&quot;input.yaml&quot;) # or below:</span>
+</span><span data-line="595"><span class="sd">        query = BoltzStructurePredictionQuery.from_protein_sequence(&quot;MLLKP&quot;)</span>
+</span><span data-line="596"><span class="sd">        response = client.send_request(query)</span>
+</span><span data-line="597"><span class="sd">        response.download_structure(&quot;structure.cif&quot;) # or below:</span>
+</span><span data-line="598"><span class="sd">        response.download_structure(&quot;structure.pdb&quot;)</span>
+</span><span data-line="599"><span class="sd">    &quot;&quot;&quot;</span>
 </span><span data-line="600">
-</span><span data-line="601">    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">:</span>
-</span><span data-line="602">        <span class="k">return</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">(</span>
-</span><span data-line="603">            <span class="n">cif_file_url</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;cif_file_url&quot;</span><span class="p">],</span>
-</span><span data-line="604">            <span class="n">confidence_data</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;confidence_data&quot;</span><span class="p">],</span>
-</span><span data-line="605">            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
-</span><span data-line="606">        <span class="p">)</span>
-</span><span data-line="607">
-</span><span data-line="608">    <span class="nd">@classmethod</span>
-</span><span data-line="609">    <span class="k">def</span> <span class="nf">from_yaml_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">):</span>
-</span><span data-line="610">        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span data-line="611">        <span class="k">if</span> <span class="n">query_name</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
-</span><span data-line="612">            <span class="n">query_name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
-</span><span data-line="613">        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span data-line="614">            <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
-</span><span data-line="615">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sequences</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;sequences&quot;</span><span class="p">],</span> <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">)</span>
-</span><span data-line="616">
-</span><span data-line="617">    <span class="nd">@classmethod</span>
-</span><span data-line="618">    <span class="k">def</span> <span class="nf">from_protein_sequence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span data-line="619">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-</span><span data-line="620">            <span class="n">sequences</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;protein&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">}}],</span>
-</span><span data-line="621">            <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">,</span>
-</span><span data-line="622">        <span class="p">)</span>
+</span><span data-line="601">    <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;protein&quot;</span><span class="p">,</span> <span class="s2">&quot;ligand&quot;</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">_Protein</span><span class="p">,</span> <span class="n">_CCD</span><span class="p">,</span> <span class="n">_Smiles</span><span class="p">]]]</span>
+</span><span data-line="602">    <span class="n">model</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;boltz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;boltz&quot;</span>
+</span><span data-line="603">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="604">
+</span><span data-line="605">    <span class="k">def</span> <span class="nf">to_request_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+</span><span data-line="606">        <span class="k">return</span> <span class="p">{</span>
+</span><span data-line="607">            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;boltz&quot;</span><span class="p">,</span>
+</span><span data-line="608">            <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;INFER_STRUCTURE&quot;</span><span class="p">}],</span>
+</span><span data-line="609">            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;query_name&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">),</span>
+</span><span data-line="610">        <span class="p">}</span>
+</span><span data-line="611">
+</span><span data-line="612">    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">:</span>
+</span><span data-line="613">        <span class="k">return</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">(</span>
+</span><span data-line="614">            <span class="n">cif_file_url</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;cif_file_url&quot;</span><span class="p">],</span>
+</span><span data-line="615">            <span class="n">confidence_data</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;confidence_data&quot;</span><span class="p">],</span>
+</span><span data-line="616">            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
+</span><span data-line="617">        <span class="p">)</span>
+</span><span data-line="618">
+</span><span data-line="619">    <span class="nd">@classmethod</span>
+</span><span data-line="620">    <span class="k">def</span> <span class="nf">from_yaml_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+</span><span data-line="621">        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span data-line="622">        <span class="k">if</span> <span class="n">query_name</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+</span><span data-line="623">            <span class="n">query_name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
+</span><span data-line="624">        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span data-line="625">            <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
+</span><span data-line="626">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sequences</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;sequences&quot;</span><span class="p">],</span> <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">)</span>
+</span><span data-line="627">
+</span><span data-line="628">    <span class="nd">@classmethod</span>
+</span><span data-line="629">    <span class="k">def</span> <span class="nf">from_protein_sequence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span data-line="630">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+</span><span data-line="631">            <span class="n">sequences</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;protein&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">}}],</span>
+</span><span data-line="632">            <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">,</span>
+</span><span data-line="633">        <span class="p">)</span>
 </span></pre></div>
         </article><button class="back-to-top" type="button">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
