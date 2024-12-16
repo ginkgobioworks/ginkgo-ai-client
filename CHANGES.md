@@ -10,7 +10,7 @@ and `Semantic versioning 2.0.0 <http://semver.org/>`\_, with the exceptions that
   typical
 
 
-# Unreleased
+# 0.5.0 (2024-12-16)
 
 Added Boltz structure inference
 
