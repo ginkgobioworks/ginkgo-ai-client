@@ -290,7 +290,7 @@ class PromoterActivityQuery(QueryBase):
     promoter_sequence: str
     orf_sequence: str
     tissue_of_interest: Dict[str, List[str]]
-    source: str 
+    source: str
     model: str = "borzoi-human-fold0"
     query_name: Optional[str] = None
 
@@ -585,6 +585,17 @@ class BoltzStructurePredictionQuery(QueryBase):
     query_name: Optional[str] = None
         The name of the query. It will appear in the API response and can be used to
         handle exceptions.
+
+    Examples
+    --------
+
+    .. code:: python
+
+        query = BoltzStructurePredictionQuery.from_yaml_file("input.yaml") # or below:
+        query = BoltzStructurePredictionQuery.from_protein_sequence("MLLKP")
+        response = client.send_request(query)
+        response.download_structure("structure.cif") # or below:
+        response.download_structure("structure.pdb")
     """
 
     sequences: List[Dict[Literal["protein", "ligand"], Union[_Protein, _CCD, _Smiles]]]
