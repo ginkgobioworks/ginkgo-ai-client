@@ -290,6 +290,7 @@ class PromoterActivityQuery(QueryBase):
     promoter_sequence: str
     orf_sequence: str
     tissue_of_interest: Dict[str, List[str]]
+    source: str 
     model: str = "borzoi-human-fold0"
     query_name: Optional[str] = None
 
@@ -299,6 +300,7 @@ class PromoterActivityQuery(QueryBase):
             "prom": self.promoter_sequence,
             "orf": self.orf_sequence,
             "tissue_of_interest": self.tissue_of_interest,
+            "source": self.source,
         }
         return {
             "model": self.model,
@@ -334,6 +336,7 @@ class PromoterActivityQuery(QueryBase):
         fasta_path: str,
         orf_sequence: str,
         tissue_of_interest: Dict[str, List[str]],
+        source: str,
         model: str = "borzoi-human-fold0",
     ):
         """Return an iterator of PromoterActivityQuery objects from the promoter
@@ -358,6 +361,7 @@ class PromoterActivityQuery(QueryBase):
                 promoter_sequence=str(record.seq),
                 orf_sequence=orf_sequence,
                 tissue_of_interest=tissue_of_interest,
+                source=source,
                 model=model,
                 query_name=record.id,
             )
@@ -371,6 +375,7 @@ class PromoterActivityQuery(QueryBase):
         fasta_path: str,
         orf_sequence: str,
         tissue_of_interest: Dict[str, List[str]],
+        source: str,
         model: str = "borzoi-human-fold0",
     ):
         """Return a list of PromoterActivityQuery objects from the promoter sequences
@@ -392,6 +397,7 @@ class PromoterActivityQuery(QueryBase):
             fasta_path=fasta_path,
             orf_sequence=orf_sequence,
             tissue_of_interest=tissue_of_interest,
+            source=source,
             model=model,
         )
         return list(iterator)
@@ -468,7 +474,7 @@ class DiffusionMaskedQuery(QueryBase):
 
     def parse_response(self, results: Dict) -> DiffusionMaskedResponse:
         return DiffusionMaskedResponse(
-            sequence=results["sequence"],
+            sequence=results["sequence"][0],
             query_name=self.query_name,
         )
 

@@ -35,6 +35,7 @@ def test_promoter_activity_iteration():
     queries = PromoterActivityQuery.list_with_promoter_from_fasta(
         fasta_path=fasta_path,
         orf_sequence="GTCCCACTGATGAACTGTGCT",
+        source="expression",
         tissue_of_interest={
             "heart": ["CNhs10608+", "CNhs10612+"],
             "liver": ["CNhs10608+", "CNhs10612+"],
