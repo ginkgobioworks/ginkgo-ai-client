@@ -398,373 +398,376 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="276"><span class="sd">    query_name: Optional[str] = None</span>
 </span><span data-line="277"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
 </span><span data-line="278"><span class="sd">        handle exceptions.</span>
-</span><span data-line="279"><span class="sd">    model: str = &quot;borzoi-human-fold0&quot;</span>
-</span><span data-line="280"><span class="sd">        The model to use for the inference (only one default model is supported for now).</span>
-</span><span data-line="281">
-</span><span data-line="282"><span class="sd">    Returns</span>
-</span><span data-line="283"><span class="sd">    -------</span>
-</span><span data-line="284"><span class="sd">    PromoterActivityResponse</span>
-</span><span data-line="285"><span class="sd">        ``client.send_request(query)`` returns a ``PromoterActivityResponse`` with</span>
-</span><span data-line="286"><span class="sd">        attributes ``activity_by_tissue`` (the activity of the promoter in each tissue)</span>
-</span><span data-line="287"><span class="sd">        and ``query_name`` (the original query&#39;s name).</span>
-</span><span data-line="288"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span data-line="289">
-</span><span data-line="290">    <span class="n">promoter_sequence</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="291">    <span class="n">orf_sequence</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="292">    <span class="n">tissue_of_interest</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-</span><span data-line="293">    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="294">    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;borzoi-human-fold0&quot;</span>
-</span><span data-line="295">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span data-line="296">
-</span><span data-line="297">    <span class="k">def</span> <span class="nf">to_request_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-</span><span data-line="298">        <span class="c1"># TODO: update the web API so the conversion isn&#39;t necessary</span>
-</span><span data-line="299">        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-</span><span data-line="300">            <span class="s2">&quot;prom&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">promoter_sequence</span><span class="p">,</span>
-</span><span data-line="301">            <span class="s2">&quot;orf&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">orf_sequence</span><span class="p">,</span>
-</span><span data-line="302">            <span class="s2">&quot;tissue_of_interest&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tissue_of_interest</span><span class="p">,</span>
-</span><span data-line="303">            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
-</span><span data-line="304">        <span class="p">}</span>
-</span><span data-line="305">        <span class="k">return</span> <span class="p">{</span>
-</span><span data-line="306">            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
-</span><span data-line="307">            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
-</span><span data-line="308">            <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;PROMOTER_ACTIVITY&quot;</span><span class="p">}],</span>
-</span><span data-line="309">        <span class="p">}</span>
-</span><span data-line="310">
-</span><span data-line="311">    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
-</span><span data-line="312">        <span class="k">return</span> <span class="n">PromoterActivityResponse</span><span class="p">(</span>
-</span><span data-line="313">            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span> <span class="n">activity_by_tissue</span><span class="o">=</span><span class="n">results</span>
-</span><span data-line="314">        <span class="p">)</span>
-</span><span data-line="315">
-</span><span data-line="316">    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
-</span><span data-line="317">    <span class="k">def</span> <span class="nf">sequences_are_valid_nucleotide_sequences</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
-</span><span data-line="318"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise an error if the sequences contain non-ATGCN characters.&quot;&quot;&quot;</span>
-</span><span data-line="319">        <span class="n">query</span><span class="o">.</span><span class="n">promoter_sequence</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">promoter_sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-</span><span data-line="320">        <span class="n">query</span><span class="o">.</span><span class="n">orf_sequence</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">orf_sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-</span><span data-line="321">        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">promoter_sequence</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="s2">&quot;ATGCN&quot;</span><span class="p">)):</span>
-</span><span data-line="322">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span data-line="323">                <span class="sa">f</span><span class="s2">&quot;Promoter sequence in query &lt;</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">query_name</span><span class="si">}</span><span class="s2">&gt; contains &quot;</span>
-</span><span data-line="324">                <span class="s2">&quot;non-ATGCN characters.&quot;</span>
-</span><span data-line="325">            <span class="p">)</span>
-</span><span data-line="326">        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">orf_sequence</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="s2">&quot;ATGCN&quot;</span><span class="p">)):</span>
-</span><span data-line="327">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span data-line="328">                <span class="sa">f</span><span class="s2">&quot;ORF sequence in query &lt;</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">query_name</span><span class="si">}</span><span class="s2">&gt; contains &quot;</span>
-</span><span data-line="329">                <span class="s2">&quot;non-ATGCN characters.&quot;</span>
-</span><span data-line="330">            <span class="p">)</span>
-</span><span data-line="331">        <span class="k">return</span> <span class="n">query</span>
-</span><span data-line="332">
-</span><span data-line="333">    <span class="nd">@classmethod</span>
-</span><span data-line="334">    <span class="k">def</span> <span class="nf">iter_with_promoter_from_fasta</span><span class="p">(</span>
-</span><span data-line="335">        <span class="bp">cls</span><span class="p">,</span>
-</span><span data-line="336">        <span class="n">fasta_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="337">        <span class="n">orf_sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="338">        <span class="n">tissue_of_interest</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
-</span><span data-line="339">        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="340">        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;borzoi-human-fold0&quot;</span><span class="p">,</span>
-</span><span data-line="341">    <span class="p">):</span>
-</span><span data-line="342"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an iterator of PromoterActivityQuery objects from the promoter</span>
-</span><span data-line="343"><span class="sd">        sequences in a fasta file. The iterator has a length attribute that gives the</span>
-</span><span data-line="344"><span class="sd">        number of sequences in the fasta file.</span>
-</span><span data-line="345">
-</span><span data-line="346"><span class="sd">        Parameters</span>
-</span><span data-line="347"><span class="sd">        ----------</span>
-</span><span data-line="348"><span class="sd">        fasta_path: str</span>
-</span><span data-line="349"><span class="sd">            The path to the fasta file containing the promoter sequences.</span>
-</span><span data-line="350"><span class="sd">        orf_sequence: str</span>
-</span><span data-line="351"><span class="sd">            The ORF sequence.</span>
-</span><span data-line="352"><span class="sd">        tissue_of_interest: Dict[str, List[str]]</span>
-</span><span data-line="353"><span class="sd">            The tissues of interest, with the tracks representing each tissue, e.g.</span>
-</span><span data-line="354"><span class="sd">            `{&quot;heart&quot;: [&quot;CNhs10608+&quot;, &quot;CNhs10612+&quot;], &quot;liver&quot;: [&quot;CNhs10608+&quot;, &quot;CNhs10612+&quot;]}`.</span>
-</span><span data-line="355"><span class="sd">        model: str = &quot;borzoi-human-fold0&quot;</span>
-</span><span data-line="356"><span class="sd">            The model to use for the inference (only one default model is supported for now).</span>
-</span><span data-line="357"><span class="sd">        &quot;&quot;&quot;</span>
-</span><span data-line="358">        <span class="n">fasta_iterator</span> <span class="o">=</span> <span class="n">fasta_sequence_iterator</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">)</span>
-</span><span data-line="359">        <span class="n">query_iterator</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="360">            <span class="bp">cls</span><span class="p">(</span>
-</span><span data-line="361">                <span class="n">promoter_sequence</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">seq</span><span class="p">),</span>
-</span><span data-line="362">                <span class="n">orf_sequence</span><span class="o">=</span><span class="n">orf_sequence</span><span class="p">,</span>
-</span><span data-line="363">                <span class="n">tissue_of_interest</span><span class="o">=</span><span class="n">tissue_of_interest</span><span class="p">,</span>
-</span><span data-line="364">                <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
-</span><span data-line="365">                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-</span><span data-line="366">                <span class="n">query_name</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-</span><span data-line="367">            <span class="p">)</span>
-</span><span data-line="368">            <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">fasta_iterator</span>
-</span><span data-line="369">        <span class="p">)</span>
-</span><span data-line="370">        <span class="k">return</span> <span class="n">IteratorWithLength</span><span class="p">(</span><span class="n">query_iterator</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fasta_iterator</span><span class="p">))</span>
-</span><span data-line="371">
-</span><span data-line="372">    <span class="nd">@classmethod</span>
-</span><span data-line="373">    <span class="k">def</span> <span class="nf">list_with_promoter_from_fasta</span><span class="p">(</span>
-</span><span data-line="374">        <span class="bp">cls</span><span class="p">,</span>
-</span><span data-line="375">        <span class="n">fasta_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="376">        <span class="n">orf_sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="377">        <span class="n">tissue_of_interest</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
-</span><span data-line="378">        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span data-line="379">        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;borzoi-human-fold0&quot;</span><span class="p">,</span>
-</span><span data-line="380">    <span class="p">):</span>
-</span><span data-line="381"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of PromoterActivityQuery objects from the promoter sequences</span>
-</span><span data-line="382"><span class="sd">        in a fasta file.</span>
-</span><span data-line="383">
-</span><span data-line="384"><span class="sd">        Parameters</span>
-</span><span data-line="385"><span class="sd">        ----------</span>
-</span><span data-line="386"><span class="sd">        fasta_path: str</span>
-</span><span data-line="387"><span class="sd">            The path to the fasta file containing the promoter sequences.</span>
-</span><span data-line="388"><span class="sd">        orf_sequence: str</span>
-</span><span data-line="389"><span class="sd">            The ORF sequence.</span>
-</span><span data-line="390"><span class="sd">        tissue_of_interest: Dict[str, List[str]]</span>
-</span><span data-line="391"><span class="sd">            The tissues of interest, with the tracks representing each tissue, e.g.</span>
-</span><span data-line="392"><span class="sd">            `{&quot;heart&quot;: [&quot;CNhs10608+&quot;, &quot;CNhs10612+&quot;], &quot;liver&quot;: [&quot;CNhs10608+&quot;, &quot;CNhs10612+&quot;]}`.</span>
-</span><span data-line="393"><span class="sd">        model: str = &quot;borzoi-human-fold0&quot;</span>
-</span><span data-line="394"><span class="sd">            The model to use for the inference (only one default model is supported for now).</span>
-</span><span data-line="395"><span class="sd">        &quot;&quot;&quot;</span>
-</span><span data-line="396">        <span class="n">iterator</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">iter_with_promoter_from_fasta</span><span class="p">(</span>
-</span><span data-line="397">            <span class="n">fasta_path</span><span class="o">=</span><span class="n">fasta_path</span><span class="p">,</span>
-</span><span data-line="398">            <span class="n">orf_sequence</span><span class="o">=</span><span class="n">orf_sequence</span><span class="p">,</span>
-</span><span data-line="399">            <span class="n">tissue_of_interest</span><span class="o">=</span><span class="n">tissue_of_interest</span><span class="p">,</span>
-</span><span data-line="400">            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
-</span><span data-line="401">            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-</span><span data-line="402">        <span class="p">)</span>
-</span><span data-line="403">        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span></div>
+</span><span data-line="279"><span class="sd">    inference_framework: Literal[&quot;promoter-0&quot;] = &quot;promoter-0&quot;</span>
+</span><span data-line="280"><span class="sd">        The inference framework to use for the inference. Currently only supports </span>
+</span><span data-line="281"><span class="sd">    borzoi_model: Literal[&quot;human-fold0&quot;] = &quot;human-fold0&quot;</span>
+</span><span data-line="282"><span class="sd">        The model to use for the inference. Currently only supports the trained </span>
+</span><span data-line="283"><span class="sd">        model of &quot;human-fold0&quot;.</span>
+</span><span data-line="284"><span class="sd">    Returns</span>
+</span><span data-line="285"><span class="sd">    -------</span>
+</span><span data-line="286"><span class="sd">    PromoterActivityResponse</span>
+</span><span data-line="287"><span class="sd">        ``client.send_request(query)`` returns a ``PromoterActivityResponse`` with</span>
+</span><span data-line="288"><span class="sd">        attributes ``activity_by_tissue`` (the activity of the promoter in each tissue)</span>
+</span><span data-line="289"><span class="sd">        and ``query_name`` (the original query&#39;s name).</span>
+</span><span data-line="290"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span data-line="291">
+</span><span data-line="292">    <span class="n">promoter_sequence</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="293">    <span class="n">orf_sequence</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="294">    <span class="n">tissue_of_interest</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+</span><span data-line="295">    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="296">    <span class="n">inference_framework</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;promoter-0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;promoter-0&quot;</span>
+</span><span data-line="297">    <span class="n">borzoi_model</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;human-fold0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;human-fold0&quot;</span>
+</span><span data-line="298">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="299">
+</span><span data-line="300">    <span class="k">def</span> <span class="nf">to_request_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+</span><span data-line="301">        <span class="c1"># TODO: update the web API so the conversion isn&#39;t necessary</span>
+</span><span data-line="302">        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+</span><span data-line="303">            <span class="s2">&quot;prom&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">promoter_sequence</span><span class="p">,</span>
+</span><span data-line="304">            <span class="s2">&quot;orf&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">orf_sequence</span><span class="p">,</span>
+</span><span data-line="305">            <span class="s2">&quot;tissue_of_interest&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tissue_of_interest</span><span class="p">,</span>
+</span><span data-line="306">            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
+</span><span data-line="307">        <span class="p">}</span>
+</span><span data-line="308">        <span class="k">return</span> <span class="p">{</span>
+</span><span data-line="309">            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;borzoi-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">borzoi_model</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+</span><span data-line="310">            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+</span><span data-line="311">            <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;PROMOTER_ACTIVITY&quot;</span><span class="p">}],</span>
+</span><span data-line="312">        <span class="p">}</span>
+</span><span data-line="313">
+</span><span data-line="314">    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+</span><span data-line="315">        <span class="k">return</span> <span class="n">PromoterActivityResponse</span><span class="p">(</span>
+</span><span data-line="316">            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span> <span class="n">activity_by_tissue</span><span class="o">=</span><span class="n">results</span>
+</span><span data-line="317">        <span class="p">)</span>
+</span><span data-line="318">
+</span><span data-line="319">    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+</span><span data-line="320">    <span class="k">def</span> <span class="nf">sequences_are_valid_nucleotide_sequences</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+</span><span data-line="321"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Raise an error if the sequences contain non-ATGCN characters.&quot;&quot;&quot;</span>
+</span><span data-line="322">        <span class="n">query</span><span class="o">.</span><span class="n">promoter_sequence</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">promoter_sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+</span><span data-line="323">        <span class="n">query</span><span class="o">.</span><span class="n">orf_sequence</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">orf_sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+</span><span data-line="324">        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">promoter_sequence</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="s2">&quot;ATGCN&quot;</span><span class="p">)):</span>
+</span><span data-line="325">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span data-line="326">                <span class="sa">f</span><span class="s2">&quot;Promoter sequence in query &lt;</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">query_name</span><span class="si">}</span><span class="s2">&gt; contains &quot;</span>
+</span><span data-line="327">                <span class="s2">&quot;non-ATGCN characters.&quot;</span>
+</span><span data-line="328">            <span class="p">)</span>
+</span><span data-line="329">        <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">orf_sequence</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="s2">&quot;ATGCN&quot;</span><span class="p">)):</span>
+</span><span data-line="330">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span data-line="331">                <span class="sa">f</span><span class="s2">&quot;ORF sequence in query &lt;</span><span class="si">{</span><span class="n">query</span><span class="o">.</span><span class="n">query_name</span><span class="si">}</span><span class="s2">&gt; contains &quot;</span>
+</span><span data-line="332">                <span class="s2">&quot;non-ATGCN characters.&quot;</span>
+</span><span data-line="333">            <span class="p">)</span>
+</span><span data-line="334">        <span class="k">return</span> <span class="n">query</span>
+</span><span data-line="335">
+</span><span data-line="336">    <span class="nd">@classmethod</span>
+</span><span data-line="337">    <span class="k">def</span> <span class="nf">iter_with_promoter_from_fasta</span><span class="p">(</span>
+</span><span data-line="338">        <span class="bp">cls</span><span class="p">,</span>
+</span><span data-line="339">        <span class="n">fasta_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="340">        <span class="n">orf_sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="341">        <span class="n">tissue_of_interest</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+</span><span data-line="342">        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="343">        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;borzoi-human-fold0&quot;</span><span class="p">,</span>
+</span><span data-line="344">    <span class="p">):</span>
+</span><span data-line="345"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an iterator of PromoterActivityQuery objects from the promoter</span>
+</span><span data-line="346"><span class="sd">        sequences in a fasta file. The iterator has a length attribute that gives the</span>
+</span><span data-line="347"><span class="sd">        number of sequences in the fasta file.</span>
+</span><span data-line="348">
+</span><span data-line="349"><span class="sd">        Parameters</span>
+</span><span data-line="350"><span class="sd">        ----------</span>
+</span><span data-line="351"><span class="sd">        fasta_path: str</span>
+</span><span data-line="352"><span class="sd">            The path to the fasta file containing the promoter sequences.</span>
+</span><span data-line="353"><span class="sd">        orf_sequence: str</span>
+</span><span data-line="354"><span class="sd">            The ORF sequence.</span>
+</span><span data-line="355"><span class="sd">        tissue_of_interest: Dict[str, List[str]]</span>
+</span><span data-line="356"><span class="sd">            The tissues of interest, with the tracks representing each tissue, e.g.</span>
+</span><span data-line="357"><span class="sd">            `{&quot;heart&quot;: [&quot;CNhs10608+&quot;, &quot;CNhs10612+&quot;], &quot;liver&quot;: [&quot;CNhs10608+&quot;, &quot;CNhs10612+&quot;]}`.</span>
+</span><span data-line="358"><span class="sd">        model: str = &quot;borzoi-human-fold0&quot;</span>
+</span><span data-line="359"><span class="sd">            The model to use for the inference (only one default model is supported for now).</span>
+</span><span data-line="360"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span data-line="361">        <span class="n">fasta_iterator</span> <span class="o">=</span> <span class="n">fasta_sequence_iterator</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">)</span>
+</span><span data-line="362">        <span class="n">query_iterator</span> <span class="o">=</span> <span class="p">(</span>
+</span><span data-line="363">            <span class="bp">cls</span><span class="p">(</span>
+</span><span data-line="364">                <span class="n">promoter_sequence</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">seq</span><span class="p">),</span>
+</span><span data-line="365">                <span class="n">orf_sequence</span><span class="o">=</span><span class="n">orf_sequence</span><span class="p">,</span>
+</span><span data-line="366">                <span class="n">tissue_of_interest</span><span class="o">=</span><span class="n">tissue_of_interest</span><span class="p">,</span>
+</span><span data-line="367">                <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+</span><span data-line="368">                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+</span><span data-line="369">                <span class="n">query_name</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+</span><span data-line="370">            <span class="p">)</span>
+</span><span data-line="371">            <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">fasta_iterator</span>
+</span><span data-line="372">        <span class="p">)</span>
+</span><span data-line="373">        <span class="k">return</span> <span class="n">IteratorWithLength</span><span class="p">(</span><span class="n">query_iterator</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fasta_iterator</span><span class="p">))</span>
+</span><span data-line="374">
+</span><span data-line="375">    <span class="nd">@classmethod</span>
+</span><span data-line="376">    <span class="k">def</span> <span class="nf">list_with_promoter_from_fasta</span><span class="p">(</span>
+</span><span data-line="377">        <span class="bp">cls</span><span class="p">,</span>
+</span><span data-line="378">        <span class="n">fasta_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="379">        <span class="n">orf_sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="380">        <span class="n">tissue_of_interest</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+</span><span data-line="381">        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span data-line="382">        <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;borzoi-human-fold0&quot;</span><span class="p">,</span>
+</span><span data-line="383">    <span class="p">):</span>
+</span><span data-line="384"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of PromoterActivityQuery objects from the promoter sequences</span>
+</span><span data-line="385"><span class="sd">        in a fasta file.</span>
+</span><span data-line="386">
+</span><span data-line="387"><span class="sd">        Parameters</span>
+</span><span data-line="388"><span class="sd">        ----------</span>
+</span><span data-line="389"><span class="sd">        fasta_path: str</span>
+</span><span data-line="390"><span class="sd">            The path to the fasta file containing the promoter sequences.</span>
+</span><span data-line="391"><span class="sd">        orf_sequence: str</span>
+</span><span data-line="392"><span class="sd">            The ORF sequence.</span>
+</span><span data-line="393"><span class="sd">        tissue_of_interest: Dict[str, List[str]]</span>
+</span><span data-line="394"><span class="sd">            The tissues of interest, with the tracks representing each tissue, e.g.</span>
+</span><span data-line="395"><span class="sd">            `{&quot;heart&quot;: [&quot;CNhs10608+&quot;, &quot;CNhs10612+&quot;], &quot;liver&quot;: [&quot;CNhs10608+&quot;, &quot;CNhs10612+&quot;]}`.</span>
+</span><span data-line="396"><span class="sd">        model: str = &quot;borzoi-human-fold0&quot;</span>
+</span><span data-line="397"><span class="sd">            The model to use for the inference (only one default model is supported for now).</span>
+</span><span data-line="398"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span data-line="399">        <span class="n">iterator</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">iter_with_promoter_from_fasta</span><span class="p">(</span>
+</span><span data-line="400">            <span class="n">fasta_path</span><span class="o">=</span><span class="n">fasta_path</span><span class="p">,</span>
+</span><span data-line="401">            <span class="n">orf_sequence</span><span class="o">=</span><span class="n">orf_sequence</span><span class="p">,</span>
+</span><span data-line="402">            <span class="n">tissue_of_interest</span><span class="o">=</span><span class="n">tissue_of_interest</span><span class="p">,</span>
+</span><span data-line="403">            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+</span><span data-line="404">            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+</span><span data-line="405">        <span class="p">)</span>
+</span><span data-line="406">        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterator</span><span class="p">)</span></div>
 
-</span><span data-line="404">
-</span><span data-line="405">
-</span><span data-line="406"><span class="c1">## ---- DIFFUSION QUERIES ---------------------------------------------------------</span>
 </span><span data-line="407">
 </span><span data-line="408">
+</span><span data-line="409"><span class="c1">## ---- DIFFUSION QUERIES ---------------------------------------------------------</span>
+</span><span data-line="410">
+</span><span data-line="411">
 <div class="viewcode-block" id="DiffusionMaskedResponse">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.DiffusionMaskedResponse">[docs]</a>
-</span><span data-line="409"><span class="k">class</span> <span class="nc">DiffusionMaskedResponse</span><span class="p">(</span><span class="n">ResponseBase</span><span class="p">):</span>
-</span><span data-line="410"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A response to a DiffusionMaskedQuery, with attributes `sequence` (the predicted</span>
-</span><span data-line="411"><span class="sd">    sequence) and `query_name` (the original query&#39;s name).</span>
-</span><span data-line="412"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span data-line="413">
-</span><span data-line="414">    <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="415">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
-
+</span><span data-line="412"><span class="k">class</span> <span class="nc">DiffusionMaskedResponse</span><span class="p">(</span><span class="n">ResponseBase</span><span class="p">):</span>
+</span><span data-line="413"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A response to a DiffusionMaskedQuery, with attributes `sequence` (the predicted</span>
+</span><span data-line="414"><span class="sd">    sequence) and `query_name` (the original query&#39;s name).</span>
+</span><span data-line="415"><span class="sd">    &quot;&quot;&quot;</span>
 </span><span data-line="416">
-</span><span data-line="417">
+</span><span data-line="417">    <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="418">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+</span><span data-line="419">
+</span><span data-line="420">
 <div class="viewcode-block" id="DiffusionMaskedQuery">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.DiffusionMaskedQuery">[docs]</a>
-</span><span data-line="418"><span class="k">class</span> <span class="nc">DiffusionMaskedQuery</span><span class="p">(</span><span class="n">QueryBase</span><span class="p">):</span>
-</span><span data-line="419"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A query to perform masked sampling using a diffusion model.</span>
-</span><span data-line="420">
-</span><span data-line="421"><span class="sd">    Parameters</span>
-</span><span data-line="422"><span class="sd">    ----------</span>
-</span><span data-line="423"><span class="sd">    sequence: str</span>
-</span><span data-line="424"><span class="sd">        Input sequence for masked sampling. The sequence may contain &quot;&lt;mask&gt;&quot; tokens.</span>
-</span><span data-line="425"><span class="sd">    temperature: float, optional (default=0.5)</span>
-</span><span data-line="426"><span class="sd">        Sampling temperature, a value between 0 and 1.</span>
-</span><span data-line="427"><span class="sd">    decoding_order_strategy: str, optional (default=&quot;entropy&quot;)</span>
-</span><span data-line="428"><span class="sd">        Strategy for decoding order, must be either &quot;max_prob&quot; or &quot;entropy&quot;.</span>
-</span><span data-line="429"><span class="sd">    unmaskings_per_step: int, optional (default=50)</span>
-</span><span data-line="430"><span class="sd">        Number of tokens to unmask per step, an integer between 1 and 1000.</span>
-</span><span data-line="431"><span class="sd">    model: str</span>
-</span><span data-line="432"><span class="sd">        The model to use for the inference.</span>
-</span><span data-line="433"><span class="sd">    query_name: Optional[str] = None</span>
-</span><span data-line="434"><span class="sd">        The name of the query. It will appear in the API response and can be used to handle exceptions.</span>
-</span><span data-line="435">
-</span><span data-line="436"><span class="sd">    Returns</span>
-</span><span data-line="437"><span class="sd">    -------</span>
-</span><span data-line="438"><span class="sd">    DiffusionMaskedResponse</span>
-</span><span data-line="439"><span class="sd">        ``client.send_request(query)`` returns a ``DiffusionMaskedResponse`` with attributes</span>
-</span><span data-line="440"><span class="sd">        ``sequence`` (the predicted sequence) and ``query_name`` (the original query&#39;s name).</span>
-</span><span data-line="441">
-</span><span data-line="442"><span class="sd">    Examples</span>
-</span><span data-line="443"><span class="sd">    --------</span>
-</span><span data-line="444"><span class="sd">    &gt;&gt;&gt; query = DiffusionMaskedQuery(</span>
-</span><span data-line="445"><span class="sd">    ...     sequence=&quot;ATTG&lt;mask&gt;TAC&quot;,</span>
-</span><span data-line="446"><span class="sd">    ...     model=&quot;lcdna&quot;,</span>
-</span><span data-line="447"><span class="sd">    ...     temperature=0.7,</span>
-</span><span data-line="448"><span class="sd">    ...     decoding_order_strategy=&quot;entropy&quot;,</span>
-</span><span data-line="449"><span class="sd">    ...     unmaskings_per_step=20,</span>
-</span><span data-line="450"><span class="sd">    ... )</span>
-</span><span data-line="451"><span class="sd">    &gt;&gt;&gt; client.send_request(query)</span>
-</span><span data-line="452"><span class="sd">    DiffusionMaskedResponse(sequence=&quot;ATTGCGTAC&quot;, query_name=None)</span>
-</span><span data-line="453"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span data-line="454">
-</span><span data-line="455">    <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="456">    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
-</span><span data-line="457">    <span class="n">decoding_order_strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;entropy&quot;</span>
-</span><span data-line="458">    <span class="n">unmaskings_per_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span>
-</span><span data-line="459">    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="460">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span data-line="461">
-</span><span data-line="462">    <span class="k">def</span> <span class="nf">to_request_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-</span><span data-line="463">        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-</span><span data-line="464">            <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
-</span><span data-line="465">            <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
-</span><span data-line="466">            <span class="s2">&quot;decoding_order_strategy&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoding_order_strategy</span><span class="p">,</span>
-</span><span data-line="467">            <span class="s2">&quot;unmaskings_per_step&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">unmaskings_per_step</span><span class="p">,</span>
-</span><span data-line="468">        <span class="p">}</span>
-</span><span data-line="469">        <span class="k">return</span> <span class="p">{</span>
-</span><span data-line="470">            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
-</span><span data-line="471">            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
-</span><span data-line="472">            <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;DIFFUSION_GENERATE&quot;</span><span class="p">}],</span>
-</span><span data-line="473">        <span class="p">}</span>
-</span><span data-line="474">
-</span><span data-line="475">    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DiffusionMaskedResponse</span><span class="p">:</span>
-</span><span data-line="476">        <span class="k">return</span> <span class="n">DiffusionMaskedResponse</span><span class="p">(</span>
-</span><span data-line="477">            <span class="n">sequence</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;sequence&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
-</span><span data-line="478">            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
-</span><span data-line="479">        <span class="p">)</span>
-</span><span data-line="480">
-</span><span data-line="481">    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
-</span><span data-line="482">    <span class="k">def</span> <span class="nf">validate_query</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
-</span><span data-line="483">        <span class="n">sequence</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">model</span>
-</span><span data-line="484">        <span class="c1"># Validate sequence and model compatibility</span>
-</span><span data-line="485">        <span class="n">_validate_model_and_sequence</span><span class="p">(</span>
-</span><span data-line="486">            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-</span><span data-line="487">            <span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
-</span><span data-line="488">            <span class="n">allow_masks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span data-line="489">        <span class="p">)</span>
-</span><span data-line="490">        <span class="c1"># Validate temperature</span>
-</span><span data-line="491">        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">query</span><span class="o">.</span><span class="n">temperature</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-</span><span data-line="492">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;temperature must be between 0 and 1&quot;</span><span class="p">)</span>
-</span><span data-line="493">        <span class="c1"># Validate decoding_order_strategy</span>
-</span><span data-line="494">        <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">decoding_order_strategy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;max_prob&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">]:</span>
-</span><span data-line="495">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;decoding_order_strategy must be &#39;max_prob&#39; or &#39;entropy&#39;&quot;</span><span class="p">)</span>
-</span><span data-line="496">        <span class="c1"># Validate unmaskings_per_step</span>
-</span><span data-line="497">        <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">query</span><span class="o">.</span><span class="n">unmaskings_per_step</span> <span class="o">&lt;=</span> <span class="mi">1000</span><span class="p">:</span>
-</span><span data-line="498">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unmaskings_per_step must be between 1 and 1000&quot;</span><span class="p">)</span>
-</span><span data-line="499">        <span class="k">return</span> <span class="n">query</span></div>
+</span><span data-line="421"><span class="k">class</span> <span class="nc">DiffusionMaskedQuery</span><span class="p">(</span><span class="n">QueryBase</span><span class="p">):</span>
+</span><span data-line="422"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A query to perform masked sampling using a diffusion model.</span>
+</span><span data-line="423">
+</span><span data-line="424"><span class="sd">    Parameters</span>
+</span><span data-line="425"><span class="sd">    ----------</span>
+</span><span data-line="426"><span class="sd">    sequence: str</span>
+</span><span data-line="427"><span class="sd">        Input sequence for masked sampling. The sequence may contain &quot;&lt;mask&gt;&quot; tokens.</span>
+</span><span data-line="428"><span class="sd">    temperature: float, optional (default=0.5)</span>
+</span><span data-line="429"><span class="sd">        Sampling temperature, a value between 0 and 1.</span>
+</span><span data-line="430"><span class="sd">    decoding_order_strategy: str, optional (default=&quot;entropy&quot;)</span>
+</span><span data-line="431"><span class="sd">        Strategy for decoding order, must be either &quot;max_prob&quot; or &quot;entropy&quot;.</span>
+</span><span data-line="432"><span class="sd">    unmaskings_per_step: int, optional (default=50)</span>
+</span><span data-line="433"><span class="sd">        Number of tokens to unmask per step, an integer between 1 and 1000.</span>
+</span><span data-line="434"><span class="sd">    model: str</span>
+</span><span data-line="435"><span class="sd">        The model to use for the inference.</span>
+</span><span data-line="436"><span class="sd">    query_name: Optional[str] = None</span>
+</span><span data-line="437"><span class="sd">        The name of the query. It will appear in the API response and can be used to handle exceptions.</span>
+</span><span data-line="438">
+</span><span data-line="439"><span class="sd">    Returns</span>
+</span><span data-line="440"><span class="sd">    -------</span>
+</span><span data-line="441"><span class="sd">    DiffusionMaskedResponse</span>
+</span><span data-line="442"><span class="sd">        ``client.send_request(query)`` returns a ``DiffusionMaskedResponse`` with attributes</span>
+</span><span data-line="443"><span class="sd">        ``sequence`` (the predicted sequence) and ``query_name`` (the original query&#39;s name).</span>
+</span><span data-line="444">
+</span><span data-line="445"><span class="sd">    Examples</span>
+</span><span data-line="446"><span class="sd">    --------</span>
+</span><span data-line="447"><span class="sd">    &gt;&gt;&gt; query = DiffusionMaskedQuery(</span>
+</span><span data-line="448"><span class="sd">    ...     sequence=&quot;ATTG&lt;mask&gt;TAC&quot;,</span>
+</span><span data-line="449"><span class="sd">    ...     model=&quot;lcdna&quot;,</span>
+</span><span data-line="450"><span class="sd">    ...     temperature=0.7,</span>
+</span><span data-line="451"><span class="sd">    ...     decoding_order_strategy=&quot;entropy&quot;,</span>
+</span><span data-line="452"><span class="sd">    ...     unmaskings_per_step=20,</span>
+</span><span data-line="453"><span class="sd">    ... )</span>
+</span><span data-line="454"><span class="sd">    &gt;&gt;&gt; client.send_request(query)</span>
+</span><span data-line="455"><span class="sd">    DiffusionMaskedResponse(sequence=&quot;ATTGCGTAC&quot;, query_name=None)</span>
+</span><span data-line="456"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span data-line="457">
+</span><span data-line="458">    <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="459">    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
+</span><span data-line="460">    <span class="n">decoding_order_strategy</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;entropy&quot;</span>
+</span><span data-line="461">    <span class="n">unmaskings_per_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span>
+</span><span data-line="462">    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="463">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="464">
+</span><span data-line="465">    <span class="k">def</span> <span class="nf">to_request_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+</span><span data-line="466">        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+</span><span data-line="467">            <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
+</span><span data-line="468">            <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span>
+</span><span data-line="469">            <span class="s2">&quot;decoding_order_strategy&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoding_order_strategy</span><span class="p">,</span>
+</span><span data-line="470">            <span class="s2">&quot;unmaskings_per_step&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">unmaskings_per_step</span><span class="p">,</span>
+</span><span data-line="471">        <span class="p">}</span>
+</span><span data-line="472">        <span class="k">return</span> <span class="p">{</span>
+</span><span data-line="473">            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+</span><span data-line="474">            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+</span><span data-line="475">            <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;DIFFUSION_GENERATE&quot;</span><span class="p">}],</span>
+</span><span data-line="476">        <span class="p">}</span>
+</span><span data-line="477">
+</span><span data-line="478">    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DiffusionMaskedResponse</span><span class="p">:</span>
+</span><span data-line="479">        <span class="k">return</span> <span class="n">DiffusionMaskedResponse</span><span class="p">(</span>
+</span><span data-line="480">            <span class="n">sequence</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;sequence&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+</span><span data-line="481">            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
+</span><span data-line="482">        <span class="p">)</span>
+</span><span data-line="483">
+</span><span data-line="484">    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+</span><span data-line="485">    <span class="k">def</span> <span class="nf">validate_query</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+</span><span data-line="486">        <span class="n">sequence</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="n">query</span><span class="o">.</span><span class="n">model</span>
+</span><span data-line="487">        <span class="c1"># Validate sequence and model compatibility</span>
+</span><span data-line="488">        <span class="n">_validate_model_and_sequence</span><span class="p">(</span>
+</span><span data-line="489">            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+</span><span data-line="490">            <span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
+</span><span data-line="491">            <span class="n">allow_masks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span data-line="492">        <span class="p">)</span>
+</span><span data-line="493">        <span class="c1"># Validate temperature</span>
+</span><span data-line="494">        <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">query</span><span class="o">.</span><span class="n">temperature</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+</span><span data-line="495">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;temperature must be between 0 and 1&quot;</span><span class="p">)</span>
+</span><span data-line="496">        <span class="c1"># Validate decoding_order_strategy</span>
+</span><span data-line="497">        <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">decoding_order_strategy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;max_prob&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">]:</span>
+</span><span data-line="498">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;decoding_order_strategy must be &#39;max_prob&#39; or &#39;entropy&#39;&quot;</span><span class="p">)</span>
+</span><span data-line="499">        <span class="c1"># Validate unmaskings_per_step</span>
+</span><span data-line="500">        <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">query</span><span class="o">.</span><span class="n">unmaskings_per_step</span> <span class="o">&lt;=</span> <span class="mi">1000</span><span class="p">:</span>
+</span><span data-line="501">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unmaskings_per_step must be between 1 and 1000&quot;</span><span class="p">)</span>
+</span><span data-line="502">        <span class="k">return</span> <span class="n">query</span></div>
 
-</span><span data-line="500">
-</span><span data-line="501">
-</span><span data-line="502"><span class="c1">## ---- STRUCTURE PREDICTION QUERIES ------------------------------------------------</span>
 </span><span data-line="503">
 </span><span data-line="504">
-</span><span data-line="505"><span class="k">class</span> <span class="nc">_Protein</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span data-line="506">    <span class="nb">id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
-</span><span data-line="507">    <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="508">
-</span><span data-line="509">    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">validator</span><span class="p">(</span><span class="s2">&quot;sequence&quot;</span><span class="p">)</span>
-</span><span data-line="510">    <span class="k">def</span> <span class="nf">validate_sequence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">):</span>
-</span><span data-line="511">        <span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-</span><span data-line="512">        <span class="n">invalid_chars</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">&quot;LAGVSERTIDPKQNFYMHWCXBUZO&quot;</span><span class="p">]</span>
-</span><span data-line="513">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_chars</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-</span><span data-line="514">            <span class="n">invalid_chars_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">invalid_chars</span><span class="p">)))</span>
-</span><span data-line="515">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span data-line="516">                <span class="sa">f</span><span class="s2">&quot;Sequence contains invalid characters: </span><span class="si">{</span><span class="n">invalid_chars_str</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span data-line="517">            <span class="p">)</span>
-</span><span data-line="518">        <span class="k">return</span> <span class="n">sequence</span>
-</span><span data-line="519">
-</span><span data-line="520">
-</span><span data-line="521"><span class="k">class</span> <span class="nc">_CCD</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span data-line="522">    <span class="nb">id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
-</span><span data-line="523">    <span class="n">ccd</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="524">
-</span><span data-line="525">
-</span><span data-line="526"><span class="k">class</span> <span class="nc">_Smiles</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span data-line="527">    <span class="nb">id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
-</span><span data-line="528">    <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="529">
-</span><span data-line="530">
+</span><span data-line="505"><span class="c1">## ---- STRUCTURE PREDICTION QUERIES ------------------------------------------------</span>
+</span><span data-line="506">
+</span><span data-line="507">
+</span><span data-line="508"><span class="k">class</span> <span class="nc">_Protein</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="509">    <span class="nb">id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
+</span><span data-line="510">    <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="511">
+</span><span data-line="512">    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">validator</span><span class="p">(</span><span class="s2">&quot;sequence&quot;</span><span class="p">)</span>
+</span><span data-line="513">    <span class="k">def</span> <span class="nf">validate_sequence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">):</span>
+</span><span data-line="514">        <span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+</span><span data-line="515">        <span class="n">invalid_chars</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">&quot;LAGVSERTIDPKQNFYMHWCXBUZO&quot;</span><span class="p">]</span>
+</span><span data-line="516">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_chars</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+</span><span data-line="517">            <span class="n">invalid_chars_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">invalid_chars</span><span class="p">)))</span>
+</span><span data-line="518">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span data-line="519">                <span class="sa">f</span><span class="s2">&quot;Sequence contains invalid characters: </span><span class="si">{</span><span class="n">invalid_chars_str</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span data-line="520">            <span class="p">)</span>
+</span><span data-line="521">        <span class="k">return</span> <span class="n">sequence</span>
+</span><span data-line="522">
+</span><span data-line="523">
+</span><span data-line="524"><span class="k">class</span> <span class="nc">_CCD</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="525">    <span class="nb">id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
+</span><span data-line="526">    <span class="n">ccd</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="527">
+</span><span data-line="528">
+</span><span data-line="529"><span class="k">class</span> <span class="nc">_Smiles</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="530">    <span class="nb">id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
+</span><span data-line="531">    <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="532">
+</span><span data-line="533">
 <div class="viewcode-block" id="BoltzStructurePredictionResponse">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.BoltzStructurePredictionResponse">[docs]</a>
-</span><span data-line="531"><span class="k">class</span> <span class="nc">BoltzStructurePredictionResponse</span><span class="p">(</span><span class="n">ResponseBase</span><span class="p">):</span>
-</span><span data-line="532"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A response to a BoltzStructurePredictionQuery</span>
-</span><span data-line="533">
-</span><span data-line="534"><span class="sd">    Attributes</span>
-</span><span data-line="535"><span class="sd">    ----------</span>
-</span><span data-line="536"><span class="sd">    cif_file_url: str</span>
-</span><span data-line="537"><span class="sd">        The URL of the cif file.</span>
-</span><span data-line="538"><span class="sd">    confidence_data: Dict[str, Any]</span>
-</span><span data-line="539"><span class="sd">        The confidence data.</span>
-</span><span data-line="540"><span class="sd">    query_name: Optional[str] = None</span>
-</span><span data-line="541"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
-</span><span data-line="542"><span class="sd">        handle exceptions.</span>
-</span><span data-line="543">
-</span><span data-line="544"><span class="sd">    Examples</span>
-</span><span data-line="545"><span class="sd">    --------</span>
+</span><span data-line="534"><span class="k">class</span> <span class="nc">BoltzStructurePredictionResponse</span><span class="p">(</span><span class="n">ResponseBase</span><span class="p">):</span>
+</span><span data-line="535"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A response to a BoltzStructurePredictionQuery</span>
+</span><span data-line="536">
+</span><span data-line="537"><span class="sd">    Attributes</span>
+</span><span data-line="538"><span class="sd">    ----------</span>
+</span><span data-line="539"><span class="sd">    cif_file_url: str</span>
+</span><span data-line="540"><span class="sd">        The URL of the cif file.</span>
+</span><span data-line="541"><span class="sd">    confidence_data: Dict[str, Any]</span>
+</span><span data-line="542"><span class="sd">        The confidence data.</span>
+</span><span data-line="543"><span class="sd">    query_name: Optional[str] = None</span>
+</span><span data-line="544"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
+</span><span data-line="545"><span class="sd">        handle exceptions.</span>
 </span><span data-line="546">
-</span><span data-line="547"><span class="sd">    .. code:: python</span>
-</span><span data-line="548">
-</span><span data-line="549"><span class="sd">        response = BoltzStructurePredictionResponse(</span>
-</span><span data-line="550"><span class="sd">            cif_file_url=&quot;https://example.com/structure.cif&quot;,</span>
-</span><span data-line="551"><span class="sd">            confidence_data={&quot;confidence&quot;: 0.95},</span>
-</span><span data-line="552"><span class="sd">            query_name=&quot;my_query&quot;,</span>
-</span><span data-line="553"><span class="sd">        )</span>
-</span><span data-line="554"><span class="sd">        response.download_structure(&quot;structure.cif&quot;) # or...</span>
-</span><span data-line="555"><span class="sd">        response.download_structure(&quot;structure.pdb&quot;)</span>
-</span><span data-line="556"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span data-line="557">
-</span><span data-line="558">    <span class="n">cif_file_url</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="559">    <span class="n">confidence_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-</span><span data-line="560">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span data-line="561">
-</span><span data-line="562">    <span class="k">def</span> <span class="nf">download_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span data-line="563"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the structure from the URL and save it to a file.&quot;&quot;&quot;</span>
-</span><span data-line="564">        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span data-line="565">        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdb&quot;</span><span class="p">):</span>
-</span><span data-line="566">            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-</span><span data-line="567">                <span class="n">cif_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;temp.cif&quot;</span>
-</span><span data-line="568">                <span class="bp">self</span><span class="o">.</span><span class="n">download_structure</span><span class="p">(</span><span class="n">cif_path</span><span class="p">)</span>
-</span><span data-line="569">                <span class="n">cif_to_pdb</span><span class="p">(</span><span class="n">cif_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-</span><span data-line="570">        <span class="k">else</span><span class="p">:</span>
-</span><span data-line="571">            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cif_file_url</span><span class="p">)</span>
-</span><span data-line="572">            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span data-line="573">                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span></div>
+</span><span data-line="547"><span class="sd">    Examples</span>
+</span><span data-line="548"><span class="sd">    --------</span>
+</span><span data-line="549">
+</span><span data-line="550"><span class="sd">    .. code:: python</span>
+</span><span data-line="551">
+</span><span data-line="552"><span class="sd">        response = BoltzStructurePredictionResponse(</span>
+</span><span data-line="553"><span class="sd">            cif_file_url=&quot;https://example.com/structure.cif&quot;,</span>
+</span><span data-line="554"><span class="sd">            confidence_data={&quot;confidence&quot;: 0.95},</span>
+</span><span data-line="555"><span class="sd">            query_name=&quot;my_query&quot;,</span>
+</span><span data-line="556"><span class="sd">        )</span>
+</span><span data-line="557"><span class="sd">        response.download_structure(&quot;structure.cif&quot;) # or...</span>
+</span><span data-line="558"><span class="sd">        response.download_structure(&quot;structure.pdb&quot;)</span>
+</span><span data-line="559"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span data-line="560">
+</span><span data-line="561">    <span class="n">cif_file_url</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="562">    <span class="n">confidence_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span><span data-line="563">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="564">
+</span><span data-line="565">    <span class="k">def</span> <span class="nf">download_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span data-line="566"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the structure from the URL and save it to a file.&quot;&quot;&quot;</span>
+</span><span data-line="567">        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span data-line="568">        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdb&quot;</span><span class="p">):</span>
+</span><span data-line="569">            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
+</span><span data-line="570">                <span class="n">cif_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;temp.cif&quot;</span>
+</span><span data-line="571">                <span class="bp">self</span><span class="o">.</span><span class="n">download_structure</span><span class="p">(</span><span class="n">cif_path</span><span class="p">)</span>
+</span><span data-line="572">                <span class="n">cif_to_pdb</span><span class="p">(</span><span class="n">cif_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+</span><span data-line="573">        <span class="k">else</span><span class="p">:</span>
+</span><span data-line="574">            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cif_file_url</span><span class="p">)</span>
+</span><span data-line="575">            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span data-line="576">                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span></div>
 
-</span><span data-line="574">
-</span><span data-line="575">
+</span><span data-line="577">
+</span><span data-line="578">
 <div class="viewcode-block" id="BoltzStructurePredictionQuery">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.BoltzStructurePredictionQuery">[docs]</a>
-</span><span data-line="576"><span class="k">class</span> <span class="nc">BoltzStructurePredictionQuery</span><span class="p">(</span><span class="n">QueryBase</span><span class="p">):</span>
-</span><span data-line="577"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A query to predict the structure of a protein using the Boltz model.</span>
-</span><span data-line="578">
-</span><span data-line="579"><span class="sd">    Parameters</span>
-</span><span data-line="580"><span class="sd">    ----------</span>
-</span><span data-line="581"><span class="sd">    sequences: List[Dict[Literal[&quot;protein&quot;, &quot;ligand&quot;], Union[_Protein, _CCD, _Smiles]]]</span>
-</span><span data-line="582"><span class="sd">        The sequences to predict the structure for</span>
-</span><span data-line="583"><span class="sd">    model: Literal[&quot;boltz&quot;] = &quot;boltz&quot;</span>
-</span><span data-line="584"><span class="sd">        The model to use for the inference (only Boltz(1) is supported for now).</span>
-</span><span data-line="585"><span class="sd">    query_name: Optional[str] = None</span>
-</span><span data-line="586"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
-</span><span data-line="587"><span class="sd">        handle exceptions.</span>
-</span><span data-line="588">
-</span><span data-line="589"><span class="sd">    Examples</span>
-</span><span data-line="590"><span class="sd">    --------</span>
+</span><span data-line="579"><span class="k">class</span> <span class="nc">BoltzStructurePredictionQuery</span><span class="p">(</span><span class="n">QueryBase</span><span class="p">):</span>
+</span><span data-line="580"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A query to predict the structure of a protein using the Boltz model.</span>
+</span><span data-line="581">
+</span><span data-line="582"><span class="sd">    Parameters</span>
+</span><span data-line="583"><span class="sd">    ----------</span>
+</span><span data-line="584"><span class="sd">    sequences: List[Dict[Literal[&quot;protein&quot;, &quot;ligand&quot;], Union[_Protein, _CCD, _Smiles]]]</span>
+</span><span data-line="585"><span class="sd">        The sequences to predict the structure for</span>
+</span><span data-line="586"><span class="sd">    model: Literal[&quot;boltz&quot;] = &quot;boltz&quot;</span>
+</span><span data-line="587"><span class="sd">        The model to use for the inference (only Boltz(1) is supported for now).</span>
+</span><span data-line="588"><span class="sd">    query_name: Optional[str] = None</span>
+</span><span data-line="589"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
+</span><span data-line="590"><span class="sd">        handle exceptions.</span>
 </span><span data-line="591">
-</span><span data-line="592"><span class="sd">    .. code:: python</span>
-</span><span data-line="593">
-</span><span data-line="594"><span class="sd">        query = BoltzStructurePredictionQuery.from_yaml_file(&quot;input.yaml&quot;) # or below:</span>
-</span><span data-line="595"><span class="sd">        query = BoltzStructurePredictionQuery.from_protein_sequence(&quot;MLLKP&quot;)</span>
-</span><span data-line="596"><span class="sd">        response = client.send_request(query)</span>
-</span><span data-line="597"><span class="sd">        response.download_structure(&quot;structure.cif&quot;) # or below:</span>
-</span><span data-line="598"><span class="sd">        response.download_structure(&quot;structure.pdb&quot;)</span>
-</span><span data-line="599"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span data-line="600">
-</span><span data-line="601">    <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;protein&quot;</span><span class="p">,</span> <span class="s2">&quot;ligand&quot;</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">_Protein</span><span class="p">,</span> <span class="n">_CCD</span><span class="p">,</span> <span class="n">_Smiles</span><span class="p">]]]</span>
-</span><span data-line="602">    <span class="n">model</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;boltz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;boltz&quot;</span>
-</span><span data-line="603">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span data-line="604">
-</span><span data-line="605">    <span class="k">def</span> <span class="nf">to_request_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-</span><span data-line="606">        <span class="k">return</span> <span class="p">{</span>
-</span><span data-line="607">            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;boltz&quot;</span><span class="p">,</span>
-</span><span data-line="608">            <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;INFER_STRUCTURE&quot;</span><span class="p">}],</span>
-</span><span data-line="609">            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;query_name&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">),</span>
-</span><span data-line="610">        <span class="p">}</span>
-</span><span data-line="611">
-</span><span data-line="612">    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">:</span>
-</span><span data-line="613">        <span class="k">return</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">(</span>
-</span><span data-line="614">            <span class="n">cif_file_url</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;cif_file_url&quot;</span><span class="p">],</span>
-</span><span data-line="615">            <span class="n">confidence_data</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;confidence_data&quot;</span><span class="p">],</span>
-</span><span data-line="616">            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
-</span><span data-line="617">        <span class="p">)</span>
-</span><span data-line="618">
-</span><span data-line="619">    <span class="nd">@classmethod</span>
-</span><span data-line="620">    <span class="k">def</span> <span class="nf">from_yaml_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">):</span>
-</span><span data-line="621">        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span data-line="622">        <span class="k">if</span> <span class="n">query_name</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
-</span><span data-line="623">            <span class="n">query_name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
-</span><span data-line="624">        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span data-line="625">            <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
-</span><span data-line="626">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sequences</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;sequences&quot;</span><span class="p">],</span> <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">)</span>
-</span><span data-line="627">
-</span><span data-line="628">    <span class="nd">@classmethod</span>
-</span><span data-line="629">    <span class="k">def</span> <span class="nf">from_protein_sequence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span data-line="630">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-</span><span data-line="631">            <span class="n">sequences</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;protein&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">}}],</span>
-</span><span data-line="632">            <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">,</span>
-</span><span data-line="633">        <span class="p">)</span></div>
+</span><span data-line="592"><span class="sd">    Examples</span>
+</span><span data-line="593"><span class="sd">    --------</span>
+</span><span data-line="594">
+</span><span data-line="595"><span class="sd">    .. code:: python</span>
+</span><span data-line="596">
+</span><span data-line="597"><span class="sd">        query = BoltzStructurePredictionQuery.from_yaml_file(&quot;input.yaml&quot;) # or below:</span>
+</span><span data-line="598"><span class="sd">        query = BoltzStructurePredictionQuery.from_protein_sequence(&quot;MLLKP&quot;)</span>
+</span><span data-line="599"><span class="sd">        response = client.send_request(query)</span>
+</span><span data-line="600"><span class="sd">        response.download_structure(&quot;structure.cif&quot;) # or below:</span>
+</span><span data-line="601"><span class="sd">        response.download_structure(&quot;structure.pdb&quot;)</span>
+</span><span data-line="602"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span data-line="603">
+</span><span data-line="604">    <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;protein&quot;</span><span class="p">,</span> <span class="s2">&quot;ligand&quot;</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">_Protein</span><span class="p">,</span> <span class="n">_CCD</span><span class="p">,</span> <span class="n">_Smiles</span><span class="p">]]]</span>
+</span><span data-line="605">    <span class="n">model</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;boltz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;boltz&quot;</span>
+</span><span data-line="606">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="607">
+</span><span data-line="608">    <span class="k">def</span> <span class="nf">to_request_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+</span><span data-line="609">        <span class="k">return</span> <span class="p">{</span>
+</span><span data-line="610">            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;boltz&quot;</span><span class="p">,</span>
+</span><span data-line="611">            <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;INFER_STRUCTURE&quot;</span><span class="p">}],</span>
+</span><span data-line="612">            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;query_name&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">),</span>
+</span><span data-line="613">        <span class="p">}</span>
+</span><span data-line="614">
+</span><span data-line="615">    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">:</span>
+</span><span data-line="616">        <span class="k">return</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">(</span>
+</span><span data-line="617">            <span class="n">cif_file_url</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;cif_file_url&quot;</span><span class="p">],</span>
+</span><span data-line="618">            <span class="n">confidence_data</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;confidence_data&quot;</span><span class="p">],</span>
+</span><span data-line="619">            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
+</span><span data-line="620">        <span class="p">)</span>
+</span><span data-line="621">
+</span><span data-line="622">    <span class="nd">@classmethod</span>
+</span><span data-line="623">    <span class="k">def</span> <span class="nf">from_yaml_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+</span><span data-line="624">        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span data-line="625">        <span class="k">if</span> <span class="n">query_name</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+</span><span data-line="626">            <span class="n">query_name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
+</span><span data-line="627">        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span data-line="628">            <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
+</span><span data-line="629">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sequences</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;sequences&quot;</span><span class="p">],</span> <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">)</span>
+</span><span data-line="630">
+</span><span data-line="631">    <span class="nd">@classmethod</span>
+</span><span data-line="632">    <span class="k">def</span> <span class="nf">from_protein_sequence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span data-line="633">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+</span><span data-line="634">            <span class="n">sequences</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;protein&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">}}],</span>
+</span><span data-line="635">            <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">,</span>
+</span><span data-line="636">        <span class="p">)</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
