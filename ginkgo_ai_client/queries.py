@@ -276,7 +276,7 @@ class PromoterActivityQuery(QueryBase):
     query_name: Optional[str] = None
         The name of the query. It will appear in the API response and can be used to
         handle exceptions.
-    inference_framework: Literal["promote-0"] = "promote-0"
+    inference_framework: Literal["promoter-0"] = "promoter-0"
         The inference framework to use for the inference. Currently only supports 
     borzoi_model: Literal["human-fold0"] = "human-fold0"
         The model to use for the inference. Currently only supports the trained 
@@ -293,7 +293,7 @@ class PromoterActivityQuery(QueryBase):
     orf_sequence: str
     tissue_of_interest: Dict[str, List[str]]
     source: str
-    inference_framework: Literal["promote-0"] = "promote-0"
+    inference_framework: Literal["promoter-0"] = "promoter-0"
     borzoi_model: Literal["human-fold0"] = "human-fold0"
     query_name: Optional[str] = None
 
