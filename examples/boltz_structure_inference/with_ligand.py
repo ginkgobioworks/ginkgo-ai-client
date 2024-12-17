@@ -1,4 +1,4 @@
-"""Simple example where we predict the 3D structure of the GFP protein."""
+"""We predict the structure of the multimer protein with ligand(s)."""
 
 from ginkgo_ai_client import GinkgoAIClient, BoltzStructurePredictionQuery
 
