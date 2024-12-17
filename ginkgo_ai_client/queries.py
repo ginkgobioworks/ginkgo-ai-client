@@ -277,9 +277,9 @@ class PromoterActivityQuery(QueryBase):
         The name of the query. It will appear in the API response and can be used to
         handle exceptions.
     inference_framework: Literal["promoter-0"] = "promoter-0"
-        The inference framework to use for the inference. Currently only supports 
+        The inference framework to use for the inference. Currently only supports
     borzoi_model: Literal["human-fold0"] = "human-fold0"
-        The model to use for the inference. Currently only supports the trained 
+        The model to use for the inference. Currently only supports the trained
         model of "human-fold0".
     Returns
     -------
@@ -511,6 +511,11 @@ class _Protein(pydantic.BaseModel):
 
     @pydantic.validator("sequence")
     def validate_sequence(cls, sequence):
+        if len(sequence) > 1000:
+            raise ValueError(
+                f"We currently only accept sequences of length 1000 or less for Boltz "
+                f"structure prediction (length: {len(sequence)})"
+            )
         sequence = sequence.upper()
         invalid_chars = [c for c in sequence if c not in "LAGVSERTIDPKQNFYMHWCXBUZO"]
         if len(invalid_chars) > 0:
@@ -579,10 +584,14 @@ class BoltzStructurePredictionResponse(ResponseBase):
 class BoltzStructurePredictionQuery(QueryBase):
     """A query to predict the structure of a protein using the Boltz model.
 
+    This type of query is better constructed using the `from_yaml_file` or
+    `from_protein_sequence` methods.
+
     Parameters
     ----------
     sequences: List[Dict[Literal["protein", "ligand"], Union[_Protein, _CCD, _Smiles]]]
-        The sequences to predict the structure for
+        The sequences to predict the structure for.
+        Only protein sequences of size <1000aa are supported for now.
     model: Literal["boltz"] = "boltz"
         The model to use for the inference (only Boltz(1) is supported for now).
     query_name: Optional[str] = None
