@@ -18,6 +18,7 @@ dependencies = [
     "requests",
     "tqdm",
     "pyyaml",
+    "pandas",
 ]
 
 [project.optional-dependencies]

@@ -3,12 +3,14 @@
 from typing import Dict, Optional, Any, List, Literal, Union
 from abc import ABC, abstractmethod
 from pathlib import Path
+from functools import lru_cache
 import json
 import yaml
 import tempfile
 
 import pydantic
 import requests
+import pandas
 
 from ginkgo_ai_client.utils import (
     fasta_sequence_iterator,
@@ -404,6 +406,34 @@ class PromoterActivityQuery(QueryBase):
             model=model,
         )
         return list(iterator)
+
+    @classmethod
+    @lru_cache(maxsize=1)
+    def _get_full_tissue_dataframe(cls):
+        file_id = "13eQTxjqW3KMCzbaRYUSbZiyzXCaNYTIg"
+        url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        tracks = pandas.read_csv(url)
+        return tracks
+
+    @classmethod
+    def get_tissue_track_dataframe(
+        cls, tissue: str = None, assay: str = None
+    ) -> pandas.DataFrame:
+        """Return a pandas DataFrame with the tissues and their corresponding tracks.
+
+        Parameters
+        ----------
+        tissue: str, optional
+            If provided, only rows with the tissue name will be returned.
+        assay: str, optional
+            If provided, only rows with the assay name will be returned.
+        """
+        df = cls._get_full_tissue_dataframe()
+        if tissue is not None:
+            df = df[df["sample"].str.contains(tissue, case=False)]
+        if assay is not None:
+            df = df[df.assay.str.contains(assay)]
+        return df
 
 
 ## ---- DIFFUSION QUERIES ---------------------------------------------------------

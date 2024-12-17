@@ -44,6 +44,11 @@ def test_promoter_activity_iteration():
     assert len(queries) == 50
 
 
+def test_get_tissue_tracks():
+    df = PromoterActivityQuery.get_tissue_track_dataframe(tissue="heart", assay="DNASE")
+    assert len(df) == 22
+
+
 @pytest.mark.parametrize(
     "filename, expected_sequences",
     [
