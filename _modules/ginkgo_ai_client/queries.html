@@ -399,9 +399,9 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="277"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
 </span><span data-line="278"><span class="sd">        handle exceptions.</span>
 </span><span data-line="279"><span class="sd">    inference_framework: Literal[&quot;promoter-0&quot;] = &quot;promoter-0&quot;</span>
-</span><span data-line="280"><span class="sd">        The inference framework to use for the inference. Currently only supports </span>
+</span><span data-line="280"><span class="sd">        The inference framework to use for the inference. Currently only supports</span>
 </span><span data-line="281"><span class="sd">    borzoi_model: Literal[&quot;human-fold0&quot;] = &quot;human-fold0&quot;</span>
-</span><span data-line="282"><span class="sd">        The model to use for the inference. Currently only supports the trained </span>
+</span><span data-line="282"><span class="sd">        The model to use for the inference. Currently only supports the trained</span>
 </span><span data-line="283"><span class="sd">        model of &quot;human-fold0&quot;.</span>
 </span><span data-line="284"><span class="sd">    Returns</span>
 </span><span data-line="285"><span class="sd">    -------</span>
@@ -640,134 +640,143 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="511">
 </span><span data-line="512">    <span class="nd">@pydantic</span><span class="o">.</span><span class="n">validator</span><span class="p">(</span><span class="s2">&quot;sequence&quot;</span><span class="p">)</span>
 </span><span data-line="513">    <span class="k">def</span> <span class="nf">validate_sequence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">):</span>
-</span><span data-line="514">        <span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-</span><span data-line="515">        <span class="n">invalid_chars</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">&quot;LAGVSERTIDPKQNFYMHWCXBUZO&quot;</span><span class="p">]</span>
-</span><span data-line="516">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_chars</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-</span><span data-line="517">            <span class="n">invalid_chars_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">invalid_chars</span><span class="p">)))</span>
-</span><span data-line="518">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span data-line="519">                <span class="sa">f</span><span class="s2">&quot;Sequence contains invalid characters: </span><span class="si">{</span><span class="n">invalid_chars_str</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span data-line="520">            <span class="p">)</span>
-</span><span data-line="521">        <span class="k">return</span> <span class="n">sequence</span>
-</span><span data-line="522">
-</span><span data-line="523">
-</span><span data-line="524"><span class="k">class</span> <span class="nc">_CCD</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
-</span><span data-line="525">    <span class="nb">id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
-</span><span data-line="526">    <span class="n">ccd</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="514">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
+</span><span data-line="515">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span data-line="516">                <span class="sa">f</span><span class="s2">&quot;We currently only accept sequences of length 1000 or less for Boltz &quot;</span>
+</span><span data-line="517">                <span class="sa">f</span><span class="s2">&quot;structure prediction (length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+</span><span data-line="518">            <span class="p">)</span>
+</span><span data-line="519">        <span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+</span><span data-line="520">        <span class="n">invalid_chars</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">&quot;LAGVSERTIDPKQNFYMHWCXBUZO&quot;</span><span class="p">]</span>
+</span><span data-line="521">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_chars</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+</span><span data-line="522">            <span class="n">invalid_chars_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">invalid_chars</span><span class="p">)))</span>
+</span><span data-line="523">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span data-line="524">                <span class="sa">f</span><span class="s2">&quot;Sequence contains invalid characters: </span><span class="si">{</span><span class="n">invalid_chars_str</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span data-line="525">            <span class="p">)</span>
+</span><span data-line="526">        <span class="k">return</span> <span class="n">sequence</span>
 </span><span data-line="527">
 </span><span data-line="528">
-</span><span data-line="529"><span class="k">class</span> <span class="nc">_Smiles</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="529"><span class="k">class</span> <span class="nc">_CCD</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
 </span><span data-line="530">    <span class="nb">id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
-</span><span data-line="531">    <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="531">    <span class="n">ccd</span><span class="p">:</span> <span class="nb">str</span>
 </span><span data-line="532">
 </span><span data-line="533">
+</span><span data-line="534"><span class="k">class</span> <span class="nc">_Smiles</span><span class="p">(</span><span class="n">pydantic</span><span class="o">.</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span data-line="535">    <span class="nb">id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
+</span><span data-line="536">    <span class="n">smiles</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="537">
+</span><span data-line="538">
 <div class="viewcode-block" id="BoltzStructurePredictionResponse">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.BoltzStructurePredictionResponse">[docs]</a>
-</span><span data-line="534"><span class="k">class</span> <span class="nc">BoltzStructurePredictionResponse</span><span class="p">(</span><span class="n">ResponseBase</span><span class="p">):</span>
-</span><span data-line="535"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A response to a BoltzStructurePredictionQuery</span>
-</span><span data-line="536">
-</span><span data-line="537"><span class="sd">    Attributes</span>
-</span><span data-line="538"><span class="sd">    ----------</span>
-</span><span data-line="539"><span class="sd">    cif_file_url: str</span>
-</span><span data-line="540"><span class="sd">        The URL of the cif file.</span>
-</span><span data-line="541"><span class="sd">    confidence_data: Dict[str, Any]</span>
-</span><span data-line="542"><span class="sd">        The confidence data.</span>
-</span><span data-line="543"><span class="sd">    query_name: Optional[str] = None</span>
-</span><span data-line="544"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
-</span><span data-line="545"><span class="sd">        handle exceptions.</span>
-</span><span data-line="546">
-</span><span data-line="547"><span class="sd">    Examples</span>
-</span><span data-line="548"><span class="sd">    --------</span>
-</span><span data-line="549">
-</span><span data-line="550"><span class="sd">    .. code:: python</span>
+</span><span data-line="539"><span class="k">class</span> <span class="nc">BoltzStructurePredictionResponse</span><span class="p">(</span><span class="n">ResponseBase</span><span class="p">):</span>
+</span><span data-line="540"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A response to a BoltzStructurePredictionQuery</span>
+</span><span data-line="541">
+</span><span data-line="542"><span class="sd">    Attributes</span>
+</span><span data-line="543"><span class="sd">    ----------</span>
+</span><span data-line="544"><span class="sd">    cif_file_url: str</span>
+</span><span data-line="545"><span class="sd">        The URL of the cif file.</span>
+</span><span data-line="546"><span class="sd">    confidence_data: Dict[str, Any]</span>
+</span><span data-line="547"><span class="sd">        The confidence data.</span>
+</span><span data-line="548"><span class="sd">    query_name: Optional[str] = None</span>
+</span><span data-line="549"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
+</span><span data-line="550"><span class="sd">        handle exceptions.</span>
 </span><span data-line="551">
-</span><span data-line="552"><span class="sd">        response = BoltzStructurePredictionResponse(</span>
-</span><span data-line="553"><span class="sd">            cif_file_url=&quot;https://example.com/structure.cif&quot;,</span>
-</span><span data-line="554"><span class="sd">            confidence_data={&quot;confidence&quot;: 0.95},</span>
-</span><span data-line="555"><span class="sd">            query_name=&quot;my_query&quot;,</span>
-</span><span data-line="556"><span class="sd">        )</span>
-</span><span data-line="557"><span class="sd">        response.download_structure(&quot;structure.cif&quot;) # or...</span>
-</span><span data-line="558"><span class="sd">        response.download_structure(&quot;structure.pdb&quot;)</span>
-</span><span data-line="559"><span class="sd">    &quot;&quot;&quot;</span>
-</span><span data-line="560">
-</span><span data-line="561">    <span class="n">cif_file_url</span><span class="p">:</span> <span class="nb">str</span>
-</span><span data-line="562">    <span class="n">confidence_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-</span><span data-line="563">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span data-line="564">
-</span><span data-line="565">    <span class="k">def</span> <span class="nf">download_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span data-line="566"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the structure from the URL and save it to a file.&quot;&quot;&quot;</span>
-</span><span data-line="567">        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span data-line="568">        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdb&quot;</span><span class="p">):</span>
-</span><span data-line="569">            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
-</span><span data-line="570">                <span class="n">cif_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;temp.cif&quot;</span>
-</span><span data-line="571">                <span class="bp">self</span><span class="o">.</span><span class="n">download_structure</span><span class="p">(</span><span class="n">cif_path</span><span class="p">)</span>
-</span><span data-line="572">                <span class="n">cif_to_pdb</span><span class="p">(</span><span class="n">cif_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-</span><span data-line="573">        <span class="k">else</span><span class="p">:</span>
-</span><span data-line="574">            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cif_file_url</span><span class="p">)</span>
-</span><span data-line="575">            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span data-line="576">                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span></div>
+</span><span data-line="552"><span class="sd">    Examples</span>
+</span><span data-line="553"><span class="sd">    --------</span>
+</span><span data-line="554">
+</span><span data-line="555"><span class="sd">    .. code:: python</span>
+</span><span data-line="556">
+</span><span data-line="557"><span class="sd">        response = BoltzStructurePredictionResponse(</span>
+</span><span data-line="558"><span class="sd">            cif_file_url=&quot;https://example.com/structure.cif&quot;,</span>
+</span><span data-line="559"><span class="sd">            confidence_data={&quot;confidence&quot;: 0.95},</span>
+</span><span data-line="560"><span class="sd">            query_name=&quot;my_query&quot;,</span>
+</span><span data-line="561"><span class="sd">        )</span>
+</span><span data-line="562"><span class="sd">        response.download_structure(&quot;structure.cif&quot;) # or...</span>
+</span><span data-line="563"><span class="sd">        response.download_structure(&quot;structure.pdb&quot;)</span>
+</span><span data-line="564"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span data-line="565">
+</span><span data-line="566">    <span class="n">cif_file_url</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="567">    <span class="n">confidence_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span><span data-line="568">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="569">
+</span><span data-line="570">    <span class="k">def</span> <span class="nf">download_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span data-line="571"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download the structure from the URL and save it to a file.&quot;&quot;&quot;</span>
+</span><span data-line="572">        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span data-line="573">        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdb&quot;</span><span class="p">):</span>
+</span><span data-line="574">            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
+</span><span data-line="575">                <span class="n">cif_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;temp.cif&quot;</span>
+</span><span data-line="576">                <span class="bp">self</span><span class="o">.</span><span class="n">download_structure</span><span class="p">(</span><span class="n">cif_path</span><span class="p">)</span>
+</span><span data-line="577">                <span class="n">cif_to_pdb</span><span class="p">(</span><span class="n">cif_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+</span><span data-line="578">        <span class="k">else</span><span class="p">:</span>
+</span><span data-line="579">            <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cif_file_url</span><span class="p">)</span>
+</span><span data-line="580">            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span data-line="581">                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span></div>
 
-</span><span data-line="577">
-</span><span data-line="578">
+</span><span data-line="582">
+</span><span data-line="583">
 <div class="viewcode-block" id="BoltzStructurePredictionQuery">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.BoltzStructurePredictionQuery">[docs]</a>
-</span><span data-line="579"><span class="k">class</span> <span class="nc">BoltzStructurePredictionQuery</span><span class="p">(</span><span class="n">QueryBase</span><span class="p">):</span>
-</span><span data-line="580"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A query to predict the structure of a protein using the Boltz model.</span>
-</span><span data-line="581">
-</span><span data-line="582"><span class="sd">    Parameters</span>
-</span><span data-line="583"><span class="sd">    ----------</span>
-</span><span data-line="584"><span class="sd">    sequences: List[Dict[Literal[&quot;protein&quot;, &quot;ligand&quot;], Union[_Protein, _CCD, _Smiles]]]</span>
-</span><span data-line="585"><span class="sd">        The sequences to predict the structure for</span>
-</span><span data-line="586"><span class="sd">    model: Literal[&quot;boltz&quot;] = &quot;boltz&quot;</span>
-</span><span data-line="587"><span class="sd">        The model to use for the inference (only Boltz(1) is supported for now).</span>
-</span><span data-line="588"><span class="sd">    query_name: Optional[str] = None</span>
-</span><span data-line="589"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
-</span><span data-line="590"><span class="sd">        handle exceptions.</span>
-</span><span data-line="591">
-</span><span data-line="592"><span class="sd">    Examples</span>
-</span><span data-line="593"><span class="sd">    --------</span>
-</span><span data-line="594">
-</span><span data-line="595"><span class="sd">    .. code:: python</span>
-</span><span data-line="596">
-</span><span data-line="597"><span class="sd">        query = BoltzStructurePredictionQuery.from_yaml_file(&quot;input.yaml&quot;) # or below:</span>
-</span><span data-line="598"><span class="sd">        query = BoltzStructurePredictionQuery.from_protein_sequence(&quot;MLLKP&quot;)</span>
-</span><span data-line="599"><span class="sd">        response = client.send_request(query)</span>
-</span><span data-line="600"><span class="sd">        response.download_structure(&quot;structure.cif&quot;) # or below:</span>
-</span><span data-line="601"><span class="sd">        response.download_structure(&quot;structure.pdb&quot;)</span>
-</span><span data-line="602"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span data-line="584"><span class="k">class</span> <span class="nc">BoltzStructurePredictionQuery</span><span class="p">(</span><span class="n">QueryBase</span><span class="p">):</span>
+</span><span data-line="585"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A query to predict the structure of a protein using the Boltz model.</span>
+</span><span data-line="586">
+</span><span data-line="587"><span class="sd">    This type of query is better constructed using the `from_yaml_file` or</span>
+</span><span data-line="588"><span class="sd">    `from_protein_sequence` methods.</span>
+</span><span data-line="589">
+</span><span data-line="590"><span class="sd">    Parameters</span>
+</span><span data-line="591"><span class="sd">    ----------</span>
+</span><span data-line="592"><span class="sd">    sequences: List[Dict[Literal[&quot;protein&quot;, &quot;ligand&quot;], Union[_Protein, _CCD, _Smiles]]]</span>
+</span><span data-line="593"><span class="sd">        The sequences to predict the structure for.</span>
+</span><span data-line="594"><span class="sd">        Only protein sequences of size &lt;1000aa are supported for now.</span>
+</span><span data-line="595"><span class="sd">    model: Literal[&quot;boltz&quot;] = &quot;boltz&quot;</span>
+</span><span data-line="596"><span class="sd">        The model to use for the inference (only Boltz(1) is supported for now).</span>
+</span><span data-line="597"><span class="sd">    query_name: Optional[str] = None</span>
+</span><span data-line="598"><span class="sd">        The name of the query. It will appear in the API response and can be used to</span>
+</span><span data-line="599"><span class="sd">        handle exceptions.</span>
+</span><span data-line="600">
+</span><span data-line="601"><span class="sd">    Examples</span>
+</span><span data-line="602"><span class="sd">    --------</span>
 </span><span data-line="603">
-</span><span data-line="604">    <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;protein&quot;</span><span class="p">,</span> <span class="s2">&quot;ligand&quot;</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">_Protein</span><span class="p">,</span> <span class="n">_CCD</span><span class="p">,</span> <span class="n">_Smiles</span><span class="p">]]]</span>
-</span><span data-line="605">    <span class="n">model</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;boltz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;boltz&quot;</span>
-</span><span data-line="606">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span data-line="607">
-</span><span data-line="608">    <span class="k">def</span> <span class="nf">to_request_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
-</span><span data-line="609">        <span class="k">return</span> <span class="p">{</span>
-</span><span data-line="610">            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;boltz&quot;</span><span class="p">,</span>
-</span><span data-line="611">            <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;INFER_STRUCTURE&quot;</span><span class="p">}],</span>
-</span><span data-line="612">            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;query_name&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">),</span>
-</span><span data-line="613">        <span class="p">}</span>
-</span><span data-line="614">
-</span><span data-line="615">    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">:</span>
-</span><span data-line="616">        <span class="k">return</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">(</span>
-</span><span data-line="617">            <span class="n">cif_file_url</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;cif_file_url&quot;</span><span class="p">],</span>
-</span><span data-line="618">            <span class="n">confidence_data</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;confidence_data&quot;</span><span class="p">],</span>
-</span><span data-line="619">            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
-</span><span data-line="620">        <span class="p">)</span>
-</span><span data-line="621">
-</span><span data-line="622">    <span class="nd">@classmethod</span>
-</span><span data-line="623">    <span class="k">def</span> <span class="nf">from_yaml_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">):</span>
-</span><span data-line="624">        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-</span><span data-line="625">        <span class="k">if</span> <span class="n">query_name</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
-</span><span data-line="626">            <span class="n">query_name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
-</span><span data-line="627">        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span data-line="628">            <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
-</span><span data-line="629">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sequences</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;sequences&quot;</span><span class="p">],</span> <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">)</span>
+</span><span data-line="604"><span class="sd">    .. code:: python</span>
+</span><span data-line="605">
+</span><span data-line="606"><span class="sd">        query = BoltzStructurePredictionQuery.from_yaml_file(&quot;input.yaml&quot;) # or below:</span>
+</span><span data-line="607"><span class="sd">        query = BoltzStructurePredictionQuery.from_protein_sequence(&quot;MLLKP&quot;)</span>
+</span><span data-line="608"><span class="sd">        response = client.send_request(query)</span>
+</span><span data-line="609"><span class="sd">        response.download_structure(&quot;structure.cif&quot;) # or below:</span>
+</span><span data-line="610"><span class="sd">        response.download_structure(&quot;structure.pdb&quot;)</span>
+</span><span data-line="611"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span data-line="612">
+</span><span data-line="613">    <span class="n">sequences</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;protein&quot;</span><span class="p">,</span> <span class="s2">&quot;ligand&quot;</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="n">_Protein</span><span class="p">,</span> <span class="n">_CCD</span><span class="p">,</span> <span class="n">_Smiles</span><span class="p">]]]</span>
+</span><span data-line="614">    <span class="n">model</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;boltz&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;boltz&quot;</span>
+</span><span data-line="615">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="616">
+</span><span data-line="617">    <span class="k">def</span> <span class="nf">to_request_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+</span><span data-line="618">        <span class="k">return</span> <span class="p">{</span>
+</span><span data-line="619">            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;boltz&quot;</span><span class="p">,</span>
+</span><span data-line="620">            <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;INFER_STRUCTURE&quot;</span><span class="p">}],</span>
+</span><span data-line="621">            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="s2">&quot;query_name&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">),</span>
+</span><span data-line="622">        <span class="p">}</span>
+</span><span data-line="623">
+</span><span data-line="624">    <span class="k">def</span> <span class="nf">parse_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">:</span>
+</span><span data-line="625">        <span class="k">return</span> <span class="n">BoltzStructurePredictionResponse</span><span class="p">(</span>
+</span><span data-line="626">            <span class="n">cif_file_url</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;cif_file_url&quot;</span><span class="p">],</span>
+</span><span data-line="627">            <span class="n">confidence_data</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;confidence_data&quot;</span><span class="p">],</span>
+</span><span data-line="628">            <span class="n">query_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span>
+</span><span data-line="629">        <span class="p">)</span>
 </span><span data-line="630">
 </span><span data-line="631">    <span class="nd">@classmethod</span>
-</span><span data-line="632">    <span class="k">def</span> <span class="nf">from_protein_sequence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span data-line="633">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-</span><span data-line="634">            <span class="n">sequences</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;protein&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">}}],</span>
-</span><span data-line="635">            <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">,</span>
-</span><span data-line="636">        <span class="p">)</span></div>
+</span><span data-line="632">    <span class="k">def</span> <span class="nf">from_yaml_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">):</span>
+</span><span data-line="633">        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span data-line="634">        <span class="k">if</span> <span class="n">query_name</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+</span><span data-line="635">            <span class="n">query_name</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
+</span><span data-line="636">        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span data-line="637">            <span class="n">data</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">)</span>
+</span><span data-line="638">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sequences</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;sequences&quot;</span><span class="p">],</span> <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">)</span>
+</span><span data-line="639">
+</span><span data-line="640">    <span class="nd">@classmethod</span>
+</span><span data-line="641">    <span class="k">def</span> <span class="nf">from_protein_sequence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span data-line="642">        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+</span><span data-line="643">            <span class="n">sequences</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;protein&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="n">sequence</span><span class="p">}}],</span>
+</span><span data-line="644">            <span class="n">query_name</span><span class="o">=</span><span class="n">query_name</span><span class="p">,</span>
+</span><span data-line="645">        <span class="p">)</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
