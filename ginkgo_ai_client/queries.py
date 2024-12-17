@@ -584,10 +584,14 @@ class BoltzStructurePredictionResponse(ResponseBase):
 class BoltzStructurePredictionQuery(QueryBase):
     """A query to predict the structure of a protein using the Boltz model.
 
+    This type of query is better constructed using the `from_yaml_file` or
+    `from_protein_sequence` methods.
+
     Parameters
     ----------
     sequences: List[Dict[Literal["protein", "ligand"], Union[_Protein, _CCD, _Smiles]]]
-        The sequences to predict the structure for
+        The sequences to predict the structure for.
+        Only protein sequences of size <1000aa are supported for now.
     model: Literal["boltz"] = "boltz"
         The model to use for the inference (only Boltz(1) is supported for now).
     query_name: Optional[str] = None
