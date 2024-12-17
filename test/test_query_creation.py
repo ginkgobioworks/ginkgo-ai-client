@@ -62,3 +62,11 @@ def test_boltz_structure_prediction_query_from_protein_sequence():
     query = BoltzStructurePredictionQuery.from_protein_sequence(sequence="MLLKP")
     sequences = query.model_dump(exclude_none=True)["sequences"]
     assert sequences == [{"protein": {"id": "A", "sequence": "MLLKP"}}]
+
+
+def test_boltz_structure_prediction_query_fails_on_sequence_too_long():
+    expected_error_message = re.escape(
+        "We currently only accept sequences of length 1000 or less"
+    )
+    with pytest.raises(ValueError, match=expected_error_message):
+        BoltzStructurePredictionQuery.from_protein_sequence(sequence=1100 * "A")
