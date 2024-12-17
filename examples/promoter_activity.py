@@ -22,7 +22,7 @@ query = PromoterActivityQuery(
 )
 
 response = client.send_request(query)
-print(response)
+print("Single-query response:", response)
 
 
 # In this next example we pull the promoter files from a fasta file and send them
@@ -39,6 +39,8 @@ queries = PromoterActivityQuery.iter_with_promoter_from_fasta(
     },
 )
 
+print("Now sending 100 requests, by batches of 10")
+print("Writing results to promoter_activity.jsonl...")
 output_file = Path(__file__).parent / "outputs" / "promoter_activity.jsonl"
 for batch_result in client.send_requests_by_batches(queries, batch_size=10):
     for query_result in batch_result:
