@@ -71,10 +71,15 @@ data-aria-dark="Switch to auto color mode">
       <i class="i-lucide close"></i>
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#handling-large-batches">Handling large batches</a></li>
+<li><a class="reference internal" href="#example-by-application">Example by application</a><ul>
 <li><a class="reference internal" href="#esm-model">ESM model</a></li>
 <li><a class="reference internal" href="#aa0-model">AA0 model</a></li>
 <li><a class="reference internal" href="#utr-model">3&#8217;UTR model</a></li>
+<li><a class="reference internal" href="#promoter-activity-with-promoter-0">Promoter activity with Promoter-0</a></li>
 <li><a class="reference internal" href="#boltz-structure-inference">Boltz structure inference</a></li>
+</ul>
+</li>
 </ul>
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
   </aside>
@@ -106,8 +111,35 @@ data-aria-dark="Switch to auto color mode">
         <article class="yue" role="main">
           <section id="examples">
 <h1>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h1>
+<section id="handling-large-batches">
+<h2>Handling large batches<a class="headerlink" href="#handling-large-batches" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;In this example, we open a large fasta file with thousands of sequence</span>
+</span><span data-line="2"><span class="linenos"> 2</span><span class="sd">(could be millions) and send it little batch by little batch to the API, and save</span>
+</span><span data-line="3"><span class="linenos"> 3</span><span class="sd">the outputs (here embeddings) to disk.&quot;&quot;&quot;</span>
+</span><span data-line="4"><span class="linenos"> 4</span>
+</span><span data-line="5"><span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+</span><span data-line="6"><span class="linenos"> 6</span><span class="kn">import</span> <span class="nn">json</span>
+</span><span data-line="7"><span class="linenos"> 7</span>
+</span><span data-line="8"><span class="linenos"> 8</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">MeanEmbeddingQuery</span>
+</span><span data-line="9"><span class="linenos"> 9</span>
+</span><span data-line="10"><span class="linenos">10</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;100_dna_sequences.fasta&quot;</span>
+</span><span data-line="11"><span class="linenos">11</span><span class="n">output_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;outputs&quot;</span> <span class="o">/</span> <span class="s2">&quot;large_batches&quot;</span>
+</span><span data-line="12"><span class="linenos">12</span><span class="n">output_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span data-line="13"><span class="linenos">13</span>
+</span><span data-line="14"><span class="linenos">14</span><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
+</span><span data-line="15"><span class="linenos">15</span><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;ginkgo-maskedlm-3utr-v1&quot;</span>
+</span><span data-line="16"><span class="linenos">16</span><span class="n">queries</span> <span class="o">=</span> <span class="n">MeanEmbeddingQuery</span><span class="o">.</span><span class="n">iter_from_fasta</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+</span><span data-line="17"><span class="linenos">17</span><span class="k">for</span> <span class="n">batch_result</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">send_requests_by_batches</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+</span><span data-line="18"><span class="linenos">18</span>    <span class="k">for</span> <span class="n">query_result</span> <span class="ow">in</span> <span class="n">batch_result</span><span class="p">:</span>
+</span><span data-line="19"><span class="linenos">19</span>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_folder</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">query_result</span><span class="o">.</span><span class="n">query_name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span data-line="20"><span class="linenos">20</span>            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">query_result</span><span class="o">.</span><span class="n">dict</span><span class="p">(),</span> <span class="n">f</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="example-by-application">
+<h2>Example by application<a class="headerlink" href="#example-by-application" title="Link to this heading">¶</a></h2>
 <section id="esm-model">
-<h2>ESM model<a class="headerlink" href="#esm-model" title="Link to this heading">¶</a></h2>
+<h3>ESM model<a class="headerlink" href="#esm-model" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;In this example we compute embedding and run masked inference</span>
 </span><span data-line="2"><span class="linenos"> 2</span><span class="sd"> on the ESM2 language model.&quot;&quot;&quot;</span>
 </span><span data-line="3"><span class="linenos"> 3</span>
@@ -145,7 +177,7 @@ data-aria-dark="Switch to auto color mode">
 </div>
 </section>
 <section id="aa0-model">
-<h2>AA0 model<a class="headerlink" href="#aa0-model" title="Link to this heading">¶</a></h2>
+<h3>AA0 model<a class="headerlink" href="#aa0-model" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;In this example we compute embedding and run masked inference</span>
 </span><span data-line="2"><span class="linenos"> 2</span><span class="sd"> on the aa0 language model.&quot;&quot;&quot;</span>
 </span><span data-line="3"><span class="linenos"> 3</span>
@@ -183,7 +215,7 @@ data-aria-dark="Switch to auto color mode">
 </div>
 </section>
 <section id="utr-model">
-<h2>3’UTR model<a class="headerlink" href="#utr-model" title="Link to this heading">¶</a></h2>
+<h3>3’UTR model<a class="headerlink" href="#utr-model" title="Link to this heading">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;In this example we compute embedding and run masked inference</span>
 </span><span data-line="2"><span class="linenos"> 2</span><span class="sd"> on Ginkgo&#39;s 3&#39;UTR language model.&quot;&quot;&quot;</span>
 </span><span data-line="3"><span class="linenos"> 3</span>
@@ -219,8 +251,59 @@ data-aria-dark="Switch to auto color mode">
 </span></pre></div>
 </div>
 </section>
+<section id="promoter-activity-with-promoter-0">
+<h3>Promoter activity with Promoter-0<a class="headerlink" href="#promoter-activity-with-promoter-0" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span data-line="2"><span class="linenos"> 2</span><span class="sd">This example shows how to use the PromoterActivityQuery to predict the activity of a</span>
+</span><span data-line="3"><span class="linenos"> 3</span><span class="sd">promoter in different tissues, based on the Borzoi model.</span>
+</span><span data-line="4"><span class="linenos"> 4</span><span class="sd">&quot;&quot;&quot;</span>
+</span><span data-line="5"><span class="linenos"> 5</span>
+</span><span data-line="6"><span class="linenos"> 6</span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+</span><span data-line="7"><span class="linenos"> 7</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">PromoterActivityQuery</span>
+</span><span data-line="8"><span class="linenos"> 8</span>
+</span><span data-line="9"><span class="linenos"> 9</span><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
+</span><span data-line="10"><span class="linenos">10</span><span class="n">orf_sequence</span> <span class="o">=</span> <span class="s2">&quot;tgccagccatctgttgtttgcc&quot;</span>
+</span><span data-line="11"><span class="linenos">11</span><span class="n">promoter_sequence</span> <span class="o">=</span> <span class="s2">&quot;GTCCCACTGATGAACTGTGCT&quot;</span>
+</span><span data-line="12"><span class="linenos">12</span>
+</span><span data-line="13"><span class="linenos">13</span>
+</span><span data-line="14"><span class="linenos">14</span><span class="n">query</span> <span class="o">=</span> <span class="n">PromoterActivityQuery</span><span class="p">(</span>
+</span><span data-line="15"><span class="linenos">15</span>    <span class="n">promoter_sequence</span><span class="o">=</span><span class="n">promoter_sequence</span><span class="p">,</span>
+</span><span data-line="16"><span class="linenos">16</span>    <span class="n">orf_sequence</span><span class="o">=</span><span class="n">orf_sequence</span><span class="p">,</span>
+</span><span data-line="17"><span class="linenos">17</span>    <span class="n">source</span><span class="o">=</span><span class="s2">&quot;expression&quot;</span><span class="p">,</span>
+</span><span data-line="18"><span class="linenos">18</span>    <span class="n">tissue_of_interest</span><span class="o">=</span><span class="p">{</span>
+</span><span data-line="19"><span class="linenos">19</span>        <span class="s2">&quot;heart&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;CNhs10608+&quot;</span><span class="p">,</span> <span class="s2">&quot;CNhs10612+&quot;</span><span class="p">],</span>
+</span><span data-line="20"><span class="linenos">20</span>        <span class="s2">&quot;liver&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;CNhs10608+&quot;</span><span class="p">,</span> <span class="s2">&quot;CNhs10612+&quot;</span><span class="p">],</span>
+</span><span data-line="21"><span class="linenos">21</span>    <span class="p">},</span>
+</span><span data-line="22"><span class="linenos">22</span><span class="p">)</span>
+</span><span data-line="23"><span class="linenos">23</span>
+</span><span data-line="24"><span class="linenos">24</span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</span><span data-line="25"><span class="linenos">25</span><span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+</span><span data-line="26"><span class="linenos">26</span>
+</span><span data-line="27"><span class="linenos">27</span>
+</span><span data-line="28"><span class="linenos">28</span><span class="c1"># In this next example we pull the promoter files from a fasta file and send them</span>
+</span><span data-line="29"><span class="linenos">29</span><span class="c1"># in batches, writing the results to a JSONL, as they arrive.</span>
+</span><span data-line="30"><span class="linenos">30</span>
+</span><span data-line="31"><span class="linenos">31</span><span class="n">fasta_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;100_dna_sequences.fasta&quot;</span>
+</span><span data-line="32"><span class="linenos">32</span><span class="n">queries</span> <span class="o">=</span> <span class="n">PromoterActivityQuery</span><span class="o">.</span><span class="n">iter_with_promoter_from_fasta</span><span class="p">(</span>
+</span><span data-line="33"><span class="linenos">33</span>    <span class="n">fasta_path</span><span class="o">=</span><span class="n">fasta_path</span><span class="p">,</span>
+</span><span data-line="34"><span class="linenos">34</span>    <span class="n">orf_sequence</span><span class="o">=</span><span class="n">orf_sequence</span><span class="p">,</span>
+</span><span data-line="35"><span class="linenos">35</span>    <span class="n">source</span><span class="o">=</span><span class="s2">&quot;expression&quot;</span><span class="p">,</span>
+</span><span data-line="36"><span class="linenos">36</span>    <span class="n">tissue_of_interest</span><span class="o">=</span><span class="p">{</span>
+</span><span data-line="37"><span class="linenos">37</span>        <span class="s2">&quot;heart&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;CNhs10608+&quot;</span><span class="p">,</span> <span class="s2">&quot;CNhs10612+&quot;</span><span class="p">],</span>
+</span><span data-line="38"><span class="linenos">38</span>        <span class="s2">&quot;liver&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;CNhs10608+&quot;</span><span class="p">,</span> <span class="s2">&quot;CNhs10612+&quot;</span><span class="p">],</span>
+</span><span data-line="39"><span class="linenos">39</span>    <span class="p">},</span>
+</span><span data-line="40"><span class="linenos">40</span><span class="p">)</span>
+</span><span data-line="41"><span class="linenos">41</span>
+</span><span data-line="42"><span class="linenos">42</span><span class="n">output_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;outputs&quot;</span> <span class="o">/</span> <span class="s2">&quot;promoter_activity.jsonl&quot;</span>
+</span><span data-line="43"><span class="linenos">43</span><span class="k">for</span> <span class="n">batch_result</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">send_requests_by_batches</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+</span><span data-line="44"><span class="linenos">44</span>    <span class="k">for</span> <span class="n">query_result</span> <span class="ow">in</span> <span class="n">batch_result</span><span class="p">:</span>
+</span><span data-line="45"><span class="linenos">45</span>        <span class="n">query_result</span><span class="o">.</span><span class="n">write_to_jsonl</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
 <section id="boltz-structure-inference">
-<h2>Boltz structure inference<a class="headerlink" href="#boltz-structure-inference" title="Link to this heading">¶</a></h2>
+<h3>Boltz structure inference<a class="headerlink" href="#boltz-structure-inference" title="Link to this heading">¶</a></h3>
+<p>Structure inference with a simple (single-chain) protein sequence:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Simple example where we predict the 3D structure of the GFP protein.&quot;&quot;&quot;</span>
 </span><span data-line="2"><span class="linenos"> 2</span>
 </span><span data-line="3"><span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">BoltzStructurePredictionQuery</span>
@@ -238,6 +321,19 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="15"><span class="linenos">15</span><span class="n">response</span><span class="o">.</span><span class="n">download_structure</span><span class="p">(</span><span class="s2">&quot;GFP.pdb&quot;</span><span class="p">)</span>
 </span></pre></div>
 </div>
+<p>Structure inference with a multimer protein sequence and ligand(s):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos">1</span><span class="sd">&quot;&quot;&quot;We predict the structure of the multimer protein with ligand(s).&quot;&quot;&quot;</span>
+</span><span data-line="2"><span class="linenos">2</span>
+</span><span data-line="3"><span class="linenos">3</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">BoltzStructurePredictionQuery</span>
+</span><span data-line="4"><span class="linenos">4</span>
+</span><span data-line="5"><span class="linenos">5</span><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
+</span><span data-line="6"><span class="linenos">6</span><span class="n">query</span> <span class="o">=</span> <span class="n">BoltzStructurePredictionQuery</span><span class="o">.</span><span class="n">from_yaml_file</span><span class="p">(</span><span class="s2">&quot;with_ligand.yaml&quot;</span><span class="p">)</span>
+</span><span data-line="7"><span class="linenos">7</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sending the request, it might take a hot minute...&quot;</span><span class="p">)</span>
+</span><span data-line="8"><span class="linenos">8</span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</span><span data-line="9"><span class="linenos">9</span><span class="n">response</span><span class="o">.</span><span class="n">download_structure</span><span class="p">(</span><span class="s2">&quot;with_ligand.cif&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
 </section>
 </section>
 

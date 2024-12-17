@@ -133,18 +133,24 @@ Store the API KEY in the <code class="docutils literal notranslate"><span class=
 </span><span data-line="3"><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
 </span><span data-line="4"><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;ginkgo-aa0-650M&quot;</span>
 </span><span data-line="5">
-</span><span data-line="6"><span class="c1"># SINGLE QUERY</span>
-</span><span data-line="7">
-</span><span data-line="8"><span class="n">query</span> <span class="o">=</span> <span class="n">MaskedInferenceQuery</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="s2">&quot;MPK&lt;mask&gt;&lt;mask&gt;RRL&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
-</span><span data-line="9"><span class="n">prediction</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-</span><span data-line="10"><span class="c1"># prediction.sequence == &quot;MPKRRRRL&quot;</span>
-</span><span data-line="11">
-</span><span data-line="12"><span class="c1"># BATCH QUERY</span>
-</span><span data-line="13">
-</span><span data-line="14"><span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MPK&lt;mask&gt;&lt;mask&gt;RRL&quot;</span><span class="p">,</span> <span class="s2">&quot;M&lt;mask&gt;RL&quot;</span><span class="p">,</span> <span class="s2">&quot;MLLM&lt;mask&gt;&lt;mask&gt;R&quot;</span><span class="p">]</span>
-</span><span data-line="15"><span class="n">queries</span> <span class="o">=</span> <span class="p">[</span><span class="n">MaskedInferenceQuery</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">]</span>
-</span><span data-line="16"><span class="n">predictions</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">send_batch_request</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
-</span><span data-line="17"><span class="c1"># predictions[0].sequence == &quot;MPKRRRRL&quot;</span>
+</span><span data-line="6"><span class="n">query</span> <span class="o">=</span> <span class="n">MaskedInferenceQuery</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="s2">&quot;MPK&lt;mask&gt;&lt;mask&gt;RRL&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+</span><span data-line="7"><span class="n">prediction</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</span><span data-line="8"><span class="c1"># prediction.sequence == &quot;MPKRRRRL&quot;</span>
+</span></pre></div>
+</div>
+<p>It is also possible to send multiple queries at once, and even recommended in most cases as these will be processed in parallel, with appropriate scaling from our servers. The <code class="docutils literal notranslate"><span class="pre">send_batch_request</span></code> method returns a list of results in the same order as the queries:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MPK&lt;mask&gt;&lt;mask&gt;RRL&quot;</span><span class="p">,</span> <span class="s2">&quot;M&lt;mask&gt;RL&quot;</span><span class="p">,</span> <span class="s2">&quot;MLLM&lt;mask&gt;&lt;mask&gt;R&quot;</span><span class="p">]</span>
+</span><span data-line="2"><span class="n">queries</span> <span class="o">=</span> <span class="p">[</span><span class="n">MaskedInferenceQuery</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">seq</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">]</span>
+</span><span data-line="3"><span class="n">predictions</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">send_batch_request</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+</span><span data-line="4"><span class="c1"># predictions[0].sequence == &quot;MPKRRRRL&quot;</span>
+</span></pre></div>
+</div>
+<p>For large datasets (say, 100,000 queries), one can also send multiple batches of requests, then iterate over the results as they are ready. Note that the order in which the results are returned is not guaranteed to be the same as the order of the queries, therefore you should make sure the queries have a <code class="docutils literal notranslate"><span class="pre">query_name</span></code> attribute that will be used to identify the results.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">MeanEmbeddingQuery</span>
+</span><span data-line="2"><span class="n">queries</span> <span class="o">=</span> <span class="n">MeanEmbeddingQuery</span><span class="o">.</span><span class="n">iter_from_fasta</span><span class="p">(</span><span class="s2">&quot;sequences.fasta&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+</span><span data-line="3"><span class="k">for</span> <span class="n">batch_results</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">send_requests_by_batches</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+</span><span data-line="4">    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">batch_results</span><span class="p">:</span>
+</span><span data-line="5">        <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">query_name</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">embedding</span><span class="p">)</span>
 </span></pre></div>
 </div>
 <p>Changing the <code class="docutils literal notranslate"><span class="pre">model</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">esm2-650M</span></code> or <code class="docutils literal notranslate"><span class="pre">esm2-3b</span></code> in this example will perform
@@ -191,15 +197,39 @@ masked inference with the ESM2 model.</p>
 <td><p>3B, 650M</p></td>
 </tr>
 <tr class="row-odd"><td><p>AA0</p></td>
-<td><p>Ginkgo’s proprietary protein language model</p></td>
+<td><p>Ginkgo’s protein language model</p></td>
 <td><p><a class="reference external" href="https://www.ginkgobioworks.com/2024/09/17/aa-0-protein-llm-technical-review/">Announcement</a></p></td>
 <td><p>Embeddings, masked inference</p></td>
 <td><p>650M</p></td>
 </tr>
 <tr class="row-even"><td><p>3UTR</p></td>
-<td><p>Ginkgo’s proprietary 3’UTR language model</p></td>
+<td><p>Ginkgo’s 3’UTR language model</p></td>
 <td><p><a class="reference external" href="https://www.biorxiv.org/content/10.1101/2024.10.07.616676v1">Preprint</a></p></td>
 <td><p>Embeddings, masked inference</p></td>
+<td><p>v1</p></td>
+</tr>
+<tr class="row-odd"><td><p>Promoter-0</p></td>
+<td><p>Ginkgo’s promoter activity model</p></td>
+<td><p>Coming soon</p></td>
+<td><p>Promoter activity accross tissues</p></td>
+<td><p>v1</p></td>
+</tr>
+<tr class="row-even"><td><p>Boltz</p></td>
+<td><p>Protein structure prediction model</p></td>
+<td><p><a class="reference external" href="https://github.com/jwohlwend/boltz">Github</a></p></td>
+<td><p>Protein structure prediction</p></td>
+<td><p>v1</p></td>
+</tr>
+<tr class="row-odd"><td><p>ABdiffusion</p></td>
+<td><p>Antibody diffusion model</p></td>
+<td><p>Coming soon</p></td>
+<td><p>Unmasking</p></td>
+<td><p>v1</p></td>
+</tr>
+<tr class="row-even"><td><p>LCDNA</p></td>
+<td><p>Long-context DNA diffusion model</p></td>
+<td><p>Coming soon</p></td>
+<td><p>Unmasking</p></td>
 <td><p>v1</p></td>
 </tr>
 </tbody>
@@ -212,7 +242,12 @@ masked inference with the ESM2 model.</p>
 </section>
 <section id="releases">
 <h2>Releases<a class="headerlink" href="#releases" title="Link to this heading">¶</a></h2>
-<p>Make sure the changelog is up to date and the top section reads <code class="docutils literal notranslate"><span class="pre">Unreleased</span></code>. Increment the version with the <code class="docutils literal notranslate"><span class="pre">bumpversion</span></code> workflow in Actions - it will update the version everywhere in the repo and create a tag. If all looks good, create a release for the tag, it will automatically publish to PyPI.</p>
+<p>To release a new version to PyPI:</p>
+<ul class="simple">
+<li><p>Make sure the changelog is up to date and the top section reads <code class="docutils literal notranslate"><span class="pre">Unreleased</span></code>.</p></li>
+<li><p>Increment the version with the <code class="docutils literal notranslate"><span class="pre">bumpversion</span></code> workflow in Actions - it will update the version everywhere in the repo and create a tag.</p></li>
+<li><p>If all looks good, create a release for the tag, it will automatically publish to PyPI.</p></li>
+</ul>
 </section>
 </section>
 <div class="toctree-wrapper compound">
