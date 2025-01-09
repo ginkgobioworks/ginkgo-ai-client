@@ -103,22 +103,22 @@ data-aria-dark="Switch to auto color mode">
       <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
         <article class="yue" role="main">
           <h1>Source code for ginkgo_ai_client.client</h1><div class="highlight"><pre>
-<span></span><span data-line="1"><span class="kn">import</span> <span class="nn">os</span>
-</span><span data-line="2"><span class="kn">import</span> <span class="nn">itertools</span>
-</span><span data-line="3"><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Union</span>
-</span><span data-line="4"><span class="kn">import</span> <span class="nn">time</span>
-</span><span data-line="5"><span class="kn">import</span> <span class="nn">warnings</span>
-</span><span data-line="6"><span class="kn">from</span> <span class="nn">concurrent</span> <span class="kn">import</span> <span class="n">futures</span>
+<span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span data-line="2"><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+</span><span data-line="3"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Union</span>
+</span><span data-line="4"><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+</span><span data-line="5"><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+</span><span data-line="6"><span class="kn">from</span><span class="w"> </span><span class="nn">concurrent</span><span class="w"> </span><span class="kn">import</span> <span class="n">futures</span>
 </span><span data-line="7">
-</span><span data-line="8"><span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
-</span><span data-line="9"><span class="kn">import</span> <span class="nn">requests</span>
+</span><span data-line="8"><span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+</span><span data-line="9"><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 </span><span data-line="10">
-</span><span data-line="11"><span class="kn">from</span> <span class="nn">ginkgo_ai_client.queries</span> <span class="kn">import</span> <span class="n">QueryBase</span>
+</span><span data-line="11"><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client.queries</span><span class="w"> </span><span class="kn">import</span> <span class="n">QueryBase</span>
 </span><span data-line="12">
 </span><span data-line="13">
 <div class="viewcode-block" id="RequestError">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.client.RequestError">[docs]</a>
-</span><span data-line="14"><span class="k">class</span> <span class="nc">RequestError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+</span><span data-line="14"><span class="k">class</span><span class="w"> </span><span class="nc">RequestError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 </span><span data-line="15"><span class="w">    </span><span class="sd">&quot;&quot;&quot;An exception raised by a request, due to the query content or a system error.</span>
 </span><span data-line="16">
 </span><span data-line="17"><span class="sd">    This exception carries the original query and the result url to enable users to</span>
@@ -139,7 +139,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="32"><span class="sd">        accidental timeout.</span>
 </span><span data-line="33"><span class="sd">    &quot;&quot;&quot;</span>
 </span><span data-line="34">
-</span><span data-line="35">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span data-line="35">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span data-line="36">        <span class="bp">self</span><span class="p">,</span>
 </span><span data-line="37">        <span class="n">cause</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span>
 </span><span data-line="38">        <span class="n">query</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QueryBase</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -151,7 +151,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="44">        <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_error_message</span><span class="p">()</span>
 </span><span data-line="45">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 </span><span data-line="46">
-</span><span data-line="47">    <span class="k">def</span> <span class="nf">_format_error_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span data-line="47">    <span class="k">def</span><span class="w"> </span><span class="nf">_format_error_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span data-line="48">        <span class="n">cause_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cause</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cause</span><span class="si">}</span><span class="s2">&quot;</span>
 </span><span data-line="49">        <span class="n">url_str</span> <span class="o">=</span> <span class="p">(</span>
 </span><span data-line="50">            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">This happened while polling this url for results:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result_url</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -164,7 +164,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="56">
 <div class="viewcode-block" id="GinkgoAIClient">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.client.GinkgoAIClient">[docs]</a>
-</span><span data-line="57"><span class="k">class</span> <span class="nc">GinkgoAIClient</span><span class="p">:</span>
+</span><span data-line="57"><span class="k">class</span><span class="w"> </span><span class="nc">GinkgoAIClient</span><span class="p">:</span>
 </span><span data-line="58"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A client for the public Ginkgo AI models API.</span>
 </span><span data-line="59">
 </span><span data-line="60"><span class="sd">    Parameters</span>
@@ -193,7 +193,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="83">    <span class="n">INFERENCE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://api.ginkgobioworks.ai/v1/transforms/run&quot;</span>
 </span><span data-line="84">    <span class="n">BATCH_INFERENCE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://api.ginkgobioworks.ai/v1/batches/transforms/run&quot;</span>
 </span><span data-line="85">
-</span><span data-line="86">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+</span><span data-line="86">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span data-line="87">        <span class="bp">self</span><span class="p">,</span>
 </span><span data-line="88">        <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span data-line="89">        <span class="n">polling_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -210,7 +210,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="100">
 <div class="viewcode-block" id="GinkgoAIClient.send_request">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.client.GinkgoAIClient.send_request">[docs]</a>
-</span><span data-line="101">    <span class="k">def</span> <span class="nf">send_request</span><span class="p">(</span>
+</span><span data-line="101">    <span class="k">def</span><span class="w"> </span><span class="nf">send_request</span><span class="p">(</span>
 </span><span data-line="102">        <span class="bp">self</span><span class="p">,</span>
 </span><span data-line="103">        <span class="n">query</span><span class="p">:</span> <span class="n">QueryBase</span><span class="p">,</span>
 </span><span data-line="104">        <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
@@ -290,7 +290,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="177">
 <div class="viewcode-block" id="GinkgoAIClient.send_batch_request">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.client.GinkgoAIClient.send_batch_request">[docs]</a>
-</span><span data-line="178">    <span class="k">def</span> <span class="nf">send_batch_request</span><span class="p">(</span>
+</span><span data-line="178">    <span class="k">def</span><span class="w"> </span><span class="nf">send_batch_request</span><span class="p">(</span>
 </span><span data-line="179">        <span class="bp">self</span><span class="p">,</span>
 </span><span data-line="180">        <span class="n">queries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">QueryBase</span><span class="p">],</span>
 </span><span data-line="181">        <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -399,7 +399,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="283">
 <div class="viewcode-block" id="GinkgoAIClient.send_requests_by_batches">
 <a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.client.GinkgoAIClient.send_requests_by_batches">[docs]</a>
-</span><span data-line="284">    <span class="k">def</span> <span class="nf">send_requests_by_batches</span><span class="p">(</span>
+</span><span data-line="284">    <span class="k">def</span><span class="w"> </span><span class="nf">send_requests_by_batches</span><span class="p">(</span>
 </span><span data-line="285">        <span class="bp">self</span><span class="p">,</span>
 </span><span data-line="286">        <span class="n">queries</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">QueryBase</span><span class="p">],</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">QueryBase</span><span class="p">]],</span>
 </span><span data-line="287">        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
@@ -474,7 +474,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="356">        <span class="k">else</span><span class="p">:</span>
 </span><span data-line="357">            <span class="n">progress_bar</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span data-line="358">
-</span><span data-line="359">        <span class="k">def</span> <span class="nf">send_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+</span><span data-line="359">        <span class="k">def</span><span class="w"> </span><span class="nf">send_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
 </span><span data-line="360">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_batch_request</span><span class="p">(</span>
 </span><span data-line="361">                <span class="n">queries</span><span class="o">=</span><span class="n">batch</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">on_failed_queries</span><span class="o">=</span><span class="n">on_failed_queries</span>
 </span><span data-line="362">            <span class="p">)</span>
@@ -489,7 +489,7 @@ data-aria-dark="Switch to auto color mode">
 
 </span><span data-line="371">
 </span><span data-line="372">    <span class="nd">@classmethod</span>
-</span><span data-line="373">    <span class="k">def</span> <span class="nf">_process_batch_request_results</span><span class="p">(</span>
+</span><span data-line="373">    <span class="k">def</span><span class="w"> </span><span class="nf">_process_batch_request_results</span><span class="p">(</span>
 </span><span data-line="374">        <span class="bp">cls</span><span class="p">,</span>
 </span><span data-line="375">        <span class="n">queries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">QueryBase</span><span class="p">],</span>
 </span><span data-line="376">        <span class="n">ordered_job_ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
@@ -523,7 +523,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="404">        <span class="k">return</span> <span class="n">parsed_results</span>
 </span><span data-line="405">
 </span><span data-line="406">    <span class="nd">@staticmethod</span>
-</span><span data-line="407">    <span class="k">def</span> <span class="nf">_parse_batch_request_result</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="n">QueryBase</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+</span><span data-line="407">    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_batch_request_result</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="n">QueryBase</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 </span><span data-line="408"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse the result of a single query from a batch request (output or error).&quot;&quot;&quot;</span>
 </span><span data-line="409">        <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="410">            <span class="k">return</span> <span class="n">RequestError</span><span class="p">(</span>
@@ -534,7 +534,7 @@ data-aria-dark="Switch to auto color mode">
 
 </span><span data-line="415">
 </span><span data-line="416">
-</span><span data-line="417"><span class="k">def</span> <span class="nf">process_with_limited_concurrency</span><span class="p">(</span>
+</span><span data-line="417"><span class="k">def</span><span class="w"> </span><span class="nf">process_with_limited_concurrency</span><span class="p">(</span>
 </span><span data-line="418">    <span class="n">element_iterator</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">max_concurrent</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="n">Optional</span> <span class="o">=</span> <span class="kc">None</span>
 </span><span data-line="419"><span class="p">):</span>
 </span><span data-line="420">    <span class="k">with</span> <span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_concurrent</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>

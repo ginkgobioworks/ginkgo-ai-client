@@ -128,7 +128,7 @@ Store the API KEY in the <code class="docutils literal notranslate"><span class=
 <p><strong>Note: This is an alpha version of the client and its interface may vary in the future.</strong></p>
 <p><strong>Example : masked inference with Ginkgo’s AA0 model</strong></p>
 <p>The client requires an API key (and defaults to <code class="docutils literal notranslate"><span class="pre">os.environ.get(&quot;GINKGOAI_API_KEY&quot;)</span></code> if none is explicitly provided)</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">MaskedInferenceQuery</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">MaskedInferenceQuery</span>
 </span><span data-line="2">
 </span><span data-line="3"><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
 </span><span data-line="4"><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;ginkgo-aa0-650M&quot;</span>
@@ -146,7 +146,7 @@ Store the API KEY in the <code class="docutils literal notranslate"><span class=
 </span></pre></div>
 </div>
 <p>For large datasets (say, 100,000 queries), one can also send multiple batches of requests, then iterate over the results as they are ready. Note that the order in which the results are returned is not guaranteed to be the same as the order of the queries, therefore you should make sure the queries have a <code class="docutils literal notranslate"><span class="pre">query_name</span></code> attribute that will be used to identify the results.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">MeanEmbeddingQuery</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeanEmbeddingQuery</span>
 </span><span data-line="2"><span class="n">queries</span> <span class="o">=</span> <span class="n">MeanEmbeddingQuery</span><span class="o">.</span><span class="n">iter_from_fasta</span><span class="p">(</span><span class="s2">&quot;sequences.fasta&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
 </span><span data-line="3"><span class="k">for</span> <span class="n">batch_results</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">send_requests_by_batches</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
 </span><span data-line="4">    <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">batch_results</span><span class="p">:</span>
@@ -156,7 +156,7 @@ Store the API KEY in the <code class="docutils literal notranslate"><span class=
 <p>Changing the <code class="docutils literal notranslate"><span class="pre">model</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">esm2-650M</span></code> or <code class="docutils literal notranslate"><span class="pre">esm2-3b</span></code> in this example will perform
 masked inference with the ESM2 model.</p>
 <p><strong>Example : embedding computation with Ginkgo’s 3’UTR language model</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">MeanEmbeddingQuery</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">MeanEmbeddingQuery</span>
 </span><span data-line="2">
 </span><span data-line="3"><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
 </span><span data-line="4"><span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;ginkgo-maskedlm-3utr-v1&quot;</span>

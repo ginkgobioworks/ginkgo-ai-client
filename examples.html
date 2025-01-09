@@ -117,10 +117,10 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="2"><span class="linenos"> 2</span><span class="sd">(could be millions) and send it little batch by little batch to the API, and save</span>
 </span><span data-line="3"><span class="linenos"> 3</span><span class="sd">the outputs (here embeddings) to disk.&quot;&quot;&quot;</span>
 </span><span data-line="4"><span class="linenos"> 4</span>
-</span><span data-line="5"><span class="linenos"> 5</span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-</span><span data-line="6"><span class="linenos"> 6</span><span class="kn">import</span> <span class="nn">json</span>
+</span><span data-line="5"><span class="linenos"> 5</span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span data-line="6"><span class="linenos"> 6</span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 </span><span data-line="7"><span class="linenos"> 7</span>
-</span><span data-line="8"><span class="linenos"> 8</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">MeanEmbeddingQuery</span>
+</span><span data-line="8"><span class="linenos"> 8</span><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">MeanEmbeddingQuery</span>
 </span><span data-line="9"><span class="linenos"> 9</span>
 </span><span data-line="10"><span class="linenos">10</span><span class="n">input_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;100_dna_sequences.fasta&quot;</span>
 </span><span data-line="11"><span class="linenos">11</span><span class="n">output_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;outputs&quot;</span> <span class="o">/</span> <span class="s2">&quot;large_batches&quot;</span>
@@ -143,7 +143,7 @@ data-aria-dark="Switch to auto color mode">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;In this example we compute embedding and run masked inference</span>
 </span><span data-line="2"><span class="linenos"> 2</span><span class="sd"> on the ESM2 language model.&quot;&quot;&quot;</span>
 </span><span data-line="3"><span class="linenos"> 3</span>
-</span><span data-line="4"><span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span data-line="4"><span class="linenos"> 4</span><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span data-line="5"><span class="linenos"> 5</span>    <span class="n">GinkgoAIClient</span><span class="p">,</span>
 </span><span data-line="6"><span class="linenos"> 6</span>    <span class="n">MaskedInferenceQuery</span><span class="p">,</span>
 </span><span data-line="7"><span class="linenos"> 7</span>    <span class="n">MeanEmbeddingQuery</span><span class="p">,</span>
@@ -181,7 +181,7 @@ data-aria-dark="Switch to auto color mode">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;In this example we compute embedding and run masked inference</span>
 </span><span data-line="2"><span class="linenos"> 2</span><span class="sd"> on the aa0 language model.&quot;&quot;&quot;</span>
 </span><span data-line="3"><span class="linenos"> 3</span>
-</span><span data-line="4"><span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span data-line="4"><span class="linenos"> 4</span><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span data-line="5"><span class="linenos"> 5</span>    <span class="n">GinkgoAIClient</span><span class="p">,</span>
 </span><span data-line="6"><span class="linenos"> 6</span>    <span class="n">MaskedInferenceQuery</span><span class="p">,</span>
 </span><span data-line="7"><span class="linenos"> 7</span>    <span class="n">MeanEmbeddingQuery</span><span class="p">,</span>
@@ -219,7 +219,7 @@ data-aria-dark="Switch to auto color mode">
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;In this example we compute embedding and run masked inference</span>
 </span><span data-line="2"><span class="linenos"> 2</span><span class="sd"> on Ginkgo&#39;s 3&#39;UTR language model.&quot;&quot;&quot;</span>
 </span><span data-line="3"><span class="linenos"> 3</span>
-</span><span data-line="4"><span class="linenos"> 4</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span data-line="4"><span class="linenos"> 4</span><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span data-line="5"><span class="linenos"> 5</span>    <span class="n">GinkgoAIClient</span><span class="p">,</span>
 </span><span data-line="6"><span class="linenos"> 6</span>    <span class="n">MaskedInferenceQuery</span><span class="p">,</span>
 </span><span data-line="7"><span class="linenos"> 7</span>    <span class="n">MeanEmbeddingQuery</span><span class="p">,</span>
@@ -258,8 +258,8 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="3"><span class="linenos"> 3</span><span class="sd">promoter in different tissues, based on the Borzoi model.</span>
 </span><span data-line="4"><span class="linenos"> 4</span><span class="sd">&quot;&quot;&quot;</span>
 </span><span data-line="5"><span class="linenos"> 5</span>
-</span><span data-line="6"><span class="linenos"> 6</span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-</span><span data-line="7"><span class="linenos"> 7</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">PromoterActivityQuery</span>
+</span><span data-line="6"><span class="linenos"> 6</span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span data-line="7"><span class="linenos"> 7</span><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">PromoterActivityQuery</span>
 </span><span data-line="8"><span class="linenos"> 8</span>
 </span><span data-line="9"><span class="linenos"> 9</span><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
 </span><span data-line="10"><span class="linenos">10</span><span class="n">orf_sequence</span> <span class="o">=</span> <span class="s2">&quot;tgccagccatctgttgtttgcc&quot;</span>
@@ -308,7 +308,7 @@ data-aria-dark="Switch to auto color mode">
 <p>Structure inference with a simple (single-chain) protein sequence:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Simple example where we predict the 3D structure of the GFP protein.&quot;&quot;&quot;</span>
 </span><span data-line="2"><span class="linenos"> 2</span>
-</span><span data-line="3"><span class="linenos"> 3</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">BoltzStructurePredictionQuery</span>
+</span><span data-line="3"><span class="linenos"> 3</span><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">BoltzStructurePredictionQuery</span>
 </span><span data-line="4"><span class="linenos"> 4</span>
 </span><span data-line="5"><span class="linenos"> 5</span><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
 </span><span data-line="6"><span class="linenos"> 6</span><span class="n">sequence</span> <span class="o">=</span> <span class="p">(</span>
@@ -326,7 +326,7 @@ data-aria-dark="Switch to auto color mode">
 <p>Structure inference with a multimer protein sequence and ligand(s):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos">1</span><span class="sd">&quot;&quot;&quot;We predict the structure of the multimer protein with ligand(s).&quot;&quot;&quot;</span>
 </span><span data-line="2"><span class="linenos">2</span>
-</span><span data-line="3"><span class="linenos">3</span><span class="kn">from</span> <span class="nn">ginkgo_ai_client</span> <span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">BoltzStructurePredictionQuery</span>
+</span><span data-line="3"><span class="linenos">3</span><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">BoltzStructurePredictionQuery</span>
 </span><span data-line="4"><span class="linenos">4</span>
 </span><span data-line="5"><span class="linenos">5</span><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
 </span><span data-line="6"><span class="linenos">6</span><span class="n">query</span> <span class="o">=</span> <span class="n">BoltzStructurePredictionQuery</span><span class="o">.</span><span class="n">from_yaml_file</span><span class="p">(</span><span class="s2">&quot;with_ligand.yaml&quot;</span><span class="p">)</span>
