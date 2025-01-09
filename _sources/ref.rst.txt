@@ -40,6 +40,15 @@ Used to generate protein or nucleotide sequences using Ginkgo-devloped diffusion
 .. autoclass:: ginkgo_ai_client.queries.DiffusionMaskedQuery
 .. autoclass:: ginkgo_ai_client.queries.DiffusionMaskedResponse
 
+
+mRNA Diffusion queries
+~~~~~~~~~~~~~~~~~~~~~~
+
+Used to linear mRNA sequences using Ginkgo-devloped diffusion models mRNA.
+
+.. autoclass:: ginkgo_ai_client.queries.RNADiffusionMaskedQuery
+.. autoclass:: ginkgo_ai_client.queries.MultimodalDiffusionMaskedResponse
+
 Boltz structure inference queries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

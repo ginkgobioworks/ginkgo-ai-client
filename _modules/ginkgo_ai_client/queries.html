@@ -575,15 +575,20 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="452"><span class="c1">## ---- mRNA DIFFUSION QUERIES -----------------------------------------------------</span>
 </span><span data-line="453">
 </span><span data-line="454">
+<div class="viewcode-block" id="MultimodalDiffusionMaskedResponse">
+<a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.MultimodalDiffusionMaskedResponse">[docs]</a>
 </span><span data-line="455"><span class="k">class</span><span class="w"> </span><span class="nc">MultimodalDiffusionMaskedResponse</span><span class="p">(</span><span class="n">ResponseBase</span><span class="p">):</span>
 </span><span data-line="456"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A response to a RNADiffusionMaskedQuery, with attributes `samples` (a list of predicted</span>
 </span><span data-line="457"><span class="sd">    samples, with modality name: predicted sequence) and `query_name` (the original query&#39;s name).</span>
 </span><span data-line="458"><span class="sd">    &quot;&quot;&quot;</span>
 </span><span data-line="459">
 </span><span data-line="460">    <span class="n">samples</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span>
-</span><span data-line="461">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="461">    <span class="n">query_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 </span><span data-line="462">
 </span><span data-line="463">
+<div class="viewcode-block" id="RNADiffusionMaskedQuery">
+<a class="viewcode-back" href="../../ref.html#ginkgo_ai_client.queries.RNADiffusionMaskedQuery">[docs]</a>
 </span><span data-line="464"><span class="k">class</span><span class="w"> </span><span class="nc">RNADiffusionMaskedQuery</span><span class="p">(</span><span class="n">QueryBase</span><span class="p">):</span>
 </span><span data-line="465"><span class="w">    </span><span class="sd">&quot;&quot;&quot;A query to perform masked sampling using a mRNA diffusion model.</span>
 </span><span data-line="466">
@@ -686,7 +691,8 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="563">        <span class="c1"># Validate unmaskings_per_step</span>
 </span><span data-line="564">        <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">query</span><span class="o">.</span><span class="n">unmaskings_per_step</span> <span class="o">&lt;=</span> <span class="mi">1000</span><span class="p">:</span>
 </span><span data-line="565">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unmaskings_per_step must be between 1 and 1000&quot;</span><span class="p">)</span>
-</span><span data-line="566">        <span class="k">return</span> <span class="n">query</span>
+</span><span data-line="566">        <span class="k">return</span> <span class="n">query</span></div>
+
 </span><span data-line="567">
 </span><span data-line="568">
 </span><span data-line="569"><span class="c1">## ---- DIFFUSION QUERIES ---------------------------------------------------------</span>
