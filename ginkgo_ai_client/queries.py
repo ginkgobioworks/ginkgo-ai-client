@@ -61,10 +61,9 @@ _maskedlm_models_properties = {
     "esm2-650M": "protein",
     "esm2-3B": "protein",
     "ginkgo-maskedlm-3utr-v1": "dna",
-    "lcdna": "nucleotide",
+    "lcdna": "dna-iupac",
     "abdiffusion": "protein",
     "mrna-foundation": "dna",
-
 }
 
 _maskedlm_models_properties_str = "\n".join(
@@ -73,9 +72,11 @@ _maskedlm_models_properties_str = "\n".join(
 )
 
 
-def _validate_model_and_sequence(model: str, sequence: str, allow_masks: bool=False, extra_chars: List[str]=[]):
+def _validate_model_and_sequence(
+    model: str, sequence: str, allow_masks: bool = False, extra_chars: List[str] = []
+):
     """Raise an error if the model is unknown or the sequence isn't compatible.
-    
+
     Parameters
     ----------
     model: str
@@ -94,21 +95,18 @@ def _validate_model_and_sequence(model: str, sequence: str, allow_masks: bool=Fa
     sequence_type = _maskedlm_models_properties[model]
     if allow_masks:
         sequence = sequence.replace("<mask>", "")
+    chars = {
+        "dna": set("ATGC"),
+        "dna-iupac": set("ATGCNRSYWKMDHBV"),
+        "protein": set("ACDEFGHIKLMNPQRSTVWY"),
+    }[sequence_type]
 
-    if sequence_type == "dna":
-        chars = {"A", "T", "G", "C"}
-    elif sequence_type == "nucleotide":
-        chars = set("atgcrsywkmdbhvn")
-    elif sequence_type == "protein":
-        chars = set("ACDEFGHIKLMNPQRSTVWY")
-    else:
-        raise ValueError("Invalid sequence type")
-   
-    chars = chars.union(set(extra_chars))
+    chars = chars.union(set([e.upper() for e in extra_chars]))
 
-    if not set(sequence).issubset(chars):
+    if not set(sequence.upper()).issubset(chars):
         raise ValueError(
-            f"Model {model} requires the sequence to only contain {''.join(chars)} characters"
+            f"Model {model} requires the sequence to only contain "
+            f"the following characters (lower or upper-case): {''.join(chars)}"
         )
 
 
@@ -453,13 +451,15 @@ class PromoterActivityQuery(QueryBase):
 
 ## ---- mRNA DIFFUSION QUERIES -----------------------------------------------------
 
+
 class MultimodalDiffusionMaskedResponse(ResponseBase):
     """A response to a RNADiffusionMaskedQuery, with attributes `samples` (a list of predicted
     samples, with modality name: predicted sequence) and `query_name` (the original query's name).
     """
 
-    samples: List[Dict[str,Union[int, str, float]]]
+    samples: List[Dict[str, Union[int, str, float]]]
     query_name: Optional[str] = None
+
 
 class RNADiffusionMaskedQuery(QueryBase):
     """A query to perform masked sampling using a mRNA diffusion model.
@@ -471,7 +471,7 @@ class RNADiffusionMaskedQuery(QueryBase):
     ...     five_utr="ATTG<mask>TAC",
     ...     protein_sequence="ATTG<mask>TAC",
     ...     species="HOMO_SAPIENS",
-    ...     model="mrna-foundation", 
+    ...     model="mrna-foundation",
     ...     temperature=1.0,
     ...     decoding_order_strategy="entropy",
     ...     unmaskings_per_step=4,
@@ -479,6 +479,7 @@ class RNADiffusionMaskedQuery(QueryBase):
     >>> client.send_request(query)
     DiffusionMaskedResponse([{"three_utr":, "five_utr":...}, ]], query_name=None)
     """
+
     three_utr: str
     five_utr: str
     protein_sequence: str
@@ -490,13 +491,13 @@ class RNADiffusionMaskedQuery(QueryBase):
     model: str
     query_name: Optional[str] = None
 
-
     def to_request_params(self) -> Dict:
 
-        # Mimics MRNATemplate https://gitlab.com/ginkgobioworks/gcp-projects/ginkgo-omni-ext/-/blob/main/server/models/mrna_foundation/main.py?ref_type=heads
         data = {
-            "three_utr": self.three_utr.replace("<mask>","[MASK]"), # UTR tokenizers require [MASK] but api client accepts <mask> for consistence across models
-            "five_utr": self.five_utr.replace("<mask>","[MASK]"),
+            "three_utr": self.three_utr.replace(
+                "<mask>", "[MASK]"
+            ),  # UTR tokenizers require [MASK] but api client accepts <mask> for consistence across models
+            "five_utr": self.five_utr.replace("<mask>", "[MASK]"),
             "sequence_aa": self.protein_sequence,
             "species": self.species,
             "temperature": self.temperature,
@@ -510,7 +511,6 @@ class RNADiffusionMaskedQuery(QueryBase):
             "transforms": [{"type": "GENERATE"}],
         }
 
-
     def parse_response(self, results: Dict) -> MultimodalDiffusionMaskedResponse:
         """
         Parameters
@@ -518,11 +518,12 @@ class RNADiffusionMaskedQuery(QueryBase):
         results: Dict
             List of dictionaries with keys "three_utr","five_utr","sequence_aa","species"
         """
-        # results is output of is MRNASamples (see https://gitlab.com/ginkgobioworks/gcp-projects/ginkgo-omni-ext/-/blob/main/server/models/mrna_foundation/main.py?ref_type=heads#L101)
         responses = results["samples"]
         for response in responses:
-            response['codon_sequence'] = response.pop('sequence_aa')
-            response["protein_sequence"] = self.protein_sequence # add back in initial protein sequence that was queried
+            response["codon_sequence"] = response.pop("sequence_aa")
+            response["protein_sequence"] = (
+                self.protein_sequence
+            )  # add back in initial protein sequence that was queried
 
         return MultimodalDiffusionMaskedResponse(
             samples=responses,
@@ -532,10 +533,10 @@ class RNADiffusionMaskedQuery(QueryBase):
     @classmethod
     @lru_cache(maxsize=1)
     def get_species_dataframe(cls):
-        file_id = "1PSkil-Ui0AkFXtYy4vJ7P6CG2QsztIxh" 
+        file_id = "1PSkil-Ui0AkFXtYy4vJ7P6CG2QsztIxh"
         url = f"https://drive.google.com/uc?export=download&id={file_id}"
         df = pandas.read_csv(url).filter(["Species"])
-        df.Species = df.Species.str.upper() # OMNI code lower cases Species
+        df.Species = df.Species.str.upper()  # OMNI code lower cases Species
         return df
 
     @pydantic.model_validator(mode="after")
@@ -544,11 +545,15 @@ class RNADiffusionMaskedQuery(QueryBase):
         _validate_model_and_sequence(query.model, query.three_utr, allow_masks=True)
         _validate_model_and_sequence(query.model, query.five_utr, allow_masks=True)
         # extra char for "-" that denotes end of the protein sequence
-        _validate_model_and_sequence("esm2-650M", query.protein_sequence, allow_masks=False, extra_chars=["-"])
+        _validate_model_and_sequence(
+            "esm2-650M", query.protein_sequence, allow_masks=False, extra_chars=["-"]
+        )
 
         if query.species not in cls.get_species_dataframe().Species.tolist():
-            raise ValueError("species is not valid. See cls.get_species_dataframe() for list of available species.")
-        
+            raise ValueError(
+                "species is not valid. See cls.get_species_dataframe() for list of available species."
+            )
+
         # Validate temperature
         if not 0 <= query.temperature <= 1:
             raise ValueError("temperature must be between 0 and 1")
@@ -561,7 +566,6 @@ class RNADiffusionMaskedQuery(QueryBase):
         return query
 
 
-    
 ## ---- DIFFUSION QUERIES ---------------------------------------------------------
 
 
@@ -572,7 +576,6 @@ class DiffusionMaskedResponse(ResponseBase):
 
     sequence: str
     query_name: Optional[str] = None
-
 
 
 class DiffusionMaskedQuery(QueryBase):
