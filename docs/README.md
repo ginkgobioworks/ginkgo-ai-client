@@ -3,9 +3,7 @@
 ## install doc requirements
 
 ```
-pushd ..
 pip install '.[docs]'
-popd
 ```
 
 ## Build docs
