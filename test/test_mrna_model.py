@@ -28,9 +28,7 @@ def test_mrna_diffusion():
         num_samples=num_samples
     )
 
-    # TODO check excluded_token_ids
     response = client.send_request(query)
-    print(response)
 
     samples = response.samples
     assert len(samples) == num_samples
@@ -44,7 +42,7 @@ def test_mrna_diffusion():
         assert sample["codon_sequence"].startswith("ATG") # Start codon
         assert sample["codon_sequence"][-3:] in ["TAA","TAG","TGA"] # stop codon
 
-        # TODO should translate
+        # should translate
         translated = str(Seq(sample["codon_sequence"]).translate())
         print(translated,  protein_sequence)
         assert translated.replace("*","-") == protein_sequence
