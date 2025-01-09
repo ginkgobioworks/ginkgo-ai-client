@@ -99,6 +99,7 @@ def _validate_model_and_sequence(model: str, sequence: str, allow_masks: bool=Fa
         chars = {"A", "T", "G", "C"}
     elif sequence_type == "nucleotide":
         chars = set("atgcrsywkmdbhvn")
+        sequence = sequence.lower()
     elif sequence_type == "protein":
         chars = set("ACDEFGHIKLMNPQRSTVWY")
     else:
