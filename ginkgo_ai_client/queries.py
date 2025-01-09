@@ -477,7 +477,7 @@ class RNADiffusionMaskedQuery(QueryBase):
     ...     unmaskings_per_step=4,
     ... )
     >>> client.send_request(query)
-    DiffusionMaskedResponse([{"three_utr":, "five_utr":...}, ]], query_name=None)
+    MultimodalDiffusionMaskedResponse([{"three_utr":, "five_utr":...}, ]], query_name=None)
     """
 
     three_utr: str
