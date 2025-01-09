@@ -26,6 +26,13 @@ AA0 model
    :language: python
    :linenos:
 
+mRNA discrete diffusion
+~~~~~~~~~
+
+.. literalinclude:: ../../examples/mrna_model.py
+   :language: python
+   :linenos:
+
 3'UTR model
 ~~~~~~~~~~~
 
