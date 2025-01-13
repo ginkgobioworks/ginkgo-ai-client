@@ -484,9 +484,11 @@ class RNADiffusionMaskedQuery(QueryBase):
     num_samples: int, optional (default=1)
         Number of samples to generate
     model: str
-        The model to use for the inference.
+        The model to use for the inference, "mrna-foundation" being the only choice
+        currently.
     query_name: Optional[str] = None
-        The name of the query. It will appear in the API response and can be used to handle exceptions.
+        The name of the query. It will appear in the API response and can be used to
+        handle exceptions.
 
     Returns
     -------
