@@ -494,21 +494,20 @@ class RNADiffusionMaskedQuery(QueryBase):
     def to_request_params(self) -> Dict:
 
         data = {
-            "three_utr": self.three_utr.replace(
-                "<mask>", "[MASK]"
-            ),  # UTR tokenizers require [MASK] but api client accepts <mask> for consistence across models
-            "five_utr": self.five_utr.replace("<mask>", "[MASK]"),
+            # Many people in the field use [MASK] but our API client uses <mask> for all models
+            "three_utr": self.three_utr.replace("[MASK]", "<mask>"),
+            "five_utr": self.five_utr.replace("[MASK]", "<mask>"),
             "sequence_aa": self.protein_sequence,
             "species": self.species,
             "temperature": self.temperature,
             "decoding_order_strategy": self.decoding_order_strategy,
-            "num_to_decode_per_step": self.unmaskings_per_step,
+            "unmaskings_per_step": self.unmaskings_per_step,
             "num_samples": self.num_samples,
         }
         return {
             "model": self.model,
             "text": json.dumps(data),
-            "transforms": [{"type": "GENERATE"}],
+            "transforms": [{"type": "MRNA_DIFFUSION_GENERATE"}],
         }
 
     def parse_response(self, results: Dict) -> MultimodalDiffusionMaskedResponse:
