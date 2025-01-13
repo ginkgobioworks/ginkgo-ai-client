@@ -464,12 +464,43 @@ class MultimodalDiffusionMaskedResponse(ResponseBase):
 class RNADiffusionMaskedQuery(QueryBase):
     """A query to perform masked sampling using a mRNA diffusion model.
 
+    Parameters
+    ----------
+    three_utr: str
+        The three UTR sequence, of the form "ATTG<mask>TAC..."
+    five_utr: str
+        The five UTR sequence, of the form "ATTG<mask>TAC..."
+    protein_sequence: str
+        The protein sequence, of the form "MLKKRRK...LP-" (the last character denotes a
+        stop codon).
+    species: str
+        The species, e.g. "HOMO_SAPIENS"
+    temperature: float, optional (default=1.0)
+        Sampling temperature, a value between 0 and 1.
+    decoding_order_strategy: str, optional (default="entropy")
+        Strategy for decoding order, must be either "max_prob" or "entropy".
+    unmaskings_per_step: int, optional (default=4)
+        Number of tokens to unmask per step
+    num_samples: int, optional (default=1)
+        Number of samples to generate
+    model: str
+        The model to use for the inference.
+    query_name: Optional[str] = None
+        The name of the query. It will appear in the API response and can be used to handle exceptions.
+
+    Returns
+    -------
+    MultimodalDiffusionMaskedResponse
+        ``client.send_request(query)`` returns a ``MultimodalDiffusionMaskedResponse`` with
+        attributes ``samples`` (a list of predicted samples, with modality name: predicted sequence)
+        and ``query_name`` (the original query's name).
+
     Examples
     --------
     >>> query = RNADiffusionMaskedQuery(
     ...     three_utr="ATTG<mask>TAC",
     ...     five_utr="ATTG<mask>TAC",
-    ...     protein_sequence="ATTG<mask>TAC",
+    ...     protein_sequence="MLKKRRK",
     ...     species="HOMO_SAPIENS",
     ...     model="mrna-foundation",
     ...     temperature=1.0,
@@ -494,7 +525,6 @@ class RNADiffusionMaskedQuery(QueryBase):
     def to_request_params(self) -> Dict:
 
         data = {
-            # Many people in the field use [MASK] but our API client uses <mask> for all models
             "three_utr": self.three_utr,
             "five_utr": self.five_utr,
             "sequence_aa": self.protein_sequence,
