@@ -494,10 +494,9 @@ class RNADiffusionMaskedQuery(QueryBase):
     def to_request_params(self) -> Dict:
 
         data = {
-            "three_utr": self.three_utr.replace(
-                "<mask>", "[MASK]"
-            ),  # UTR tokenizers require [MASK] but api client accepts <mask> for consistence across models
-            "five_utr": self.five_utr.replace("<mask>", "[MASK]"),
+            # Many people in the field use [MASK] but our API client uses <mask> for all models
+            "three_utr": self.three_utr.replace("[MASK]", "<mask>"),
+            "five_utr": self.five_utr.replace("[MASK]", "<mask>"),
             "sequence_aa": self.protein_sequence,
             "species": self.species,
             "temperature": self.temperature,
