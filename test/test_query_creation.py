@@ -1,11 +1,7 @@
 import pytest
 import re
 from pathlib import Path
-from ginkgo_ai_client.queries import (
-    MeanEmbeddingQuery,
-    PromoterActivityQuery,
-    BoltzStructurePredictionQuery,
-)
+from ginkgo_ai_client.queries import MeanEmbeddingQuery, PromoterActivityQuery
 
 
 def test_that_forgetting_to_name_arguments_raises_the_better_error_message():
@@ -47,31 +43,3 @@ def test_promoter_activity_iteration():
 def test_get_tissue_tracks():
     df = PromoterActivityQuery.get_tissue_track_dataframe(tissue="heart", assay="DNASE")
     assert len(df) == 22
-
-
-@pytest.mark.parametrize(
-    "filename, expected_sequences",
-    [
-        ("boltz_input_ligand.yaml", 3),
-        ("boltz_input_multimer.yaml", 2),
-    ],
-)
-def test_boltz_structure_prediction_query_from_yaml_file(filename, expected_sequences):
-    query = BoltzStructurePredictionQuery.from_yaml_file(
-        Path(__file__).parent / "data" / filename
-    )
-    assert len(query.sequences) == expected_sequences
-
-
-def test_boltz_structure_prediction_query_from_protein_sequence():
-    query = BoltzStructurePredictionQuery.from_protein_sequence(sequence="MLLKP")
-    sequences = query.model_dump(exclude_none=True)["sequences"]
-    assert sequences == [{"protein": {"id": "A", "sequence": "MLLKP"}}]
-
-
-def test_boltz_structure_prediction_query_fails_on_sequence_too_long():
-    expected_error_message = re.escape(
-        "We currently only accept sequences of length 1000 or less"
-    )
-    with pytest.raises(ValueError, match=expected_error_message):
-        BoltzStructurePredictionQuery.from_protein_sequence(sequence=1100 * "A")

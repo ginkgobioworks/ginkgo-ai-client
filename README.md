@@ -91,7 +91,6 @@ See the [example folder](examples/) and [reference docs](https://ginkgobioworks.
 | AA0         | Ginkgo's protein language model        | [Announcement](https://www.ginkgobioworks.com/2024/09/17/aa-0-protein-llm-technical-review/) | Embeddings, masked inference      | 650M     |
 | 3UTR        | Ginkgo's 3'UTR language model          | [Preprint](https://www.biorxiv.org/content/10.1101/2024.10.07.616676v1)                      | Embeddings, masked inference      | v1       |
 | Promoter-0  | Ginkgo's promoter activity model       | Coming soon                                                                                  | Promoter activity accross tissues | v1       |
-| Boltz       | Protein structure prediction model     | [Github](https://github.com/jwohlwend/boltz)                                                 | Protein structure prediction      | v1       |
 | ABdiffusion | Antibody diffusion model               | Coming soon                                                                                  | Unmasking                         | v1       |
 | LCDNA       | Long-context DNA diffusion model       | Coming soon                                                                                  | Unmasking                         | v1       |
 

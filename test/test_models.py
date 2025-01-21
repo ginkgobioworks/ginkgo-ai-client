@@ -8,9 +8,9 @@ from ginkgo_ai_client import (
     MeanEmbeddingQuery,
     PromoterActivityQuery,
     DiffusionMaskedQuery,
-    BoltzStructurePredictionQuery,
 )
 from pydantic_core import ValidationError
+
 
 @pytest.mark.parametrize(
     "model, sequence, expected_sequence",
@@ -67,9 +67,10 @@ def test_promoter_activity():
     assert "heart" in response.activity_by_tissue
     assert "liver" in response.activity_by_tissue
 
+
 def test_promoter_activity_fails_with_invalid_framework_name():
     client = GinkgoAIClient()
-    
+
     with pytest.raises(ValidationError) as exc_info:
         query = PromoterActivityQuery(
             promoter_sequence="tgccagccatctgttgtttgcc",
@@ -79,11 +80,12 @@ def test_promoter_activity_fails_with_invalid_framework_name():
                 "heart": ["CNhs10608+", "CNhs10612+"],
                 "liver": ["CNhs10608+", "CNhs10612+"],
             },
-            inference_framework="promoter-2"  # invalid framework
+            inference_framework="promoter-2",  # invalid framework
         )
-    
+
     assert "Input should be 'promoter-0' " in str(exc_info.value)
     assert "type=literal_error" in str(exc_info.value)
+
 
 @pytest.mark.parametrize(
     "model, sequence",
@@ -104,13 +106,3 @@ def test_diffusion_masked_inference(model, sequence):
     response = client.send_request(query)
     assert isinstance(response.sequence, str)
     assert "<mask>" not in response.sequence
-
-
-def test_boltz_structure_prediction():
-    client = GinkgoAIClient()
-    data_file = Path(__file__).parent / "data" / "boltz_input_single_chain.yaml"
-    query = BoltzStructurePredictionQuery.from_yaml_file(data_file)
-    response = client.send_request(query, timeout=1000)
-    with tempfile.TemporaryDirectory() as temp_dir:
-        response.download_structure(Path(temp_dir) / "structure.cif")
-        response.download_structure(Path(temp_dir) / "structure.pdb")
