@@ -78,7 +78,6 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#mrna-discrete-diffusion">mRNA discrete diffusion</a></li>
 <li><a class="reference internal" href="#utr-model">3&#8217;UTR model</a></li>
 <li><a class="reference internal" href="#promoter-activity-with-promoter-0">Promoter activity with Promoter-0</a></li>
-<li><a class="reference internal" href="#boltz-structure-inference">Boltz structure inference</a></li>
 </ul>
 </li>
 </ul>
@@ -341,39 +340,6 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="45"><span class="linenos">45</span><span class="k">for</span> <span class="n">batch_result</span> <span class="ow">in</span> <span class="n">client</span><span class="o">.</span><span class="n">send_requests_by_batches</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 </span><span data-line="46"><span class="linenos">46</span>    <span class="k">for</span> <span class="n">query_result</span> <span class="ow">in</span> <span class="n">batch_result</span><span class="p">:</span>
 </span><span data-line="47"><span class="linenos">47</span>        <span class="n">query_result</span><span class="o">.</span><span class="n">write_to_jsonl</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
-</span></pre></div>
-</div>
-</section>
-<section id="boltz-structure-inference">
-<h3>Boltz structure inference<a class="headerlink" href="#boltz-structure-inference" title="Link to this heading">¶</a></h3>
-<p>Structure inference with a simple (single-chain) protein sequence:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos"> 1</span><span class="sd">&quot;&quot;&quot;Simple example where we predict the 3D structure of the GFP protein.&quot;&quot;&quot;</span>
-</span><span data-line="2"><span class="linenos"> 2</span>
-</span><span data-line="3"><span class="linenos"> 3</span><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">BoltzStructurePredictionQuery</span>
-</span><span data-line="4"><span class="linenos"> 4</span>
-</span><span data-line="5"><span class="linenos"> 5</span><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
-</span><span data-line="6"><span class="linenos"> 6</span><span class="n">sequence</span> <span class="o">=</span> <span class="p">(</span>
-</span><span data-line="7"><span class="linenos"> 7</span>    <span class="s2">&quot;MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTL&quot;</span>
-</span><span data-line="8"><span class="linenos"> 8</span>    <span class="s2">&quot;VTTFSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLV&quot;</span>
-</span><span data-line="9"><span class="linenos"> 9</span>    <span class="s2">&quot;NRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLAD&quot;</span>
-</span><span data-line="10"><span class="linenos">10</span>    <span class="s2">&quot;HYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK&quot;</span>
-</span><span data-line="11"><span class="linenos">11</span><span class="p">)</span>
-</span><span data-line="12"><span class="linenos">12</span>
-</span><span data-line="13"><span class="linenos">13</span><span class="n">query</span> <span class="o">=</span> <span class="n">BoltzStructurePredictionQuery</span><span class="o">.</span><span class="n">from_protein_sequence</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
-</span><span data-line="14"><span class="linenos">14</span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-</span><span data-line="15"><span class="linenos">15</span><span class="n">response</span><span class="o">.</span><span class="n">download_structure</span><span class="p">(</span><span class="s2">&quot;GFP.pdb&quot;</span><span class="p">)</span>
-</span></pre></div>
-</div>
-<p>Structure inference with a multimer protein sequence and ligand(s):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="linenos">1</span><span class="sd">&quot;&quot;&quot;We predict the structure of the multimer protein with ligand(s).&quot;&quot;&quot;</span>
-</span><span data-line="2"><span class="linenos">2</span>
-</span><span data-line="3"><span class="linenos">3</span><span class="kn">from</span><span class="w"> </span><span class="nn">ginkgo_ai_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">GinkgoAIClient</span><span class="p">,</span> <span class="n">BoltzStructurePredictionQuery</span>
-</span><span data-line="4"><span class="linenos">4</span>
-</span><span data-line="5"><span class="linenos">5</span><span class="n">client</span> <span class="o">=</span> <span class="n">GinkgoAIClient</span><span class="p">()</span>
-</span><span data-line="6"><span class="linenos">6</span><span class="n">query</span> <span class="o">=</span> <span class="n">BoltzStructurePredictionQuery</span><span class="o">.</span><span class="n">from_yaml_file</span><span class="p">(</span><span class="s2">&quot;with_ligand.yaml&quot;</span><span class="p">)</span>
-</span><span data-line="7"><span class="linenos">7</span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sending the request, it might take a hot minute...&quot;</span><span class="p">)</span>
-</span><span data-line="8"><span class="linenos">8</span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-</span><span data-line="9"><span class="linenos">9</span><span class="n">response</span><span class="o">.</span><span class="n">download_structure</span><span class="p">(</span><span class="s2">&quot;with_ligand.cif&quot;</span><span class="p">)</span>
 </span></pre></div>
 </div>
 </section>
