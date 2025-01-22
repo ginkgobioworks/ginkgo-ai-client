@@ -48,11 +48,3 @@ Used to linear mRNA sequences using Ginkgo-devloped diffusion models mRNA.
 
 .. autoclass:: ginkgo_ai_client.queries.RNADiffusionMaskedQuery
 .. autoclass:: ginkgo_ai_client.queries.MultimodalDiffusionMaskedResponse
-
-Boltz structure inference queries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Used to predict the 3D structure of a protein sequence using Boltz.
-
-.. autoclass:: ginkgo_ai_client.queries.BoltzStructurePredictionQuery
-.. autoclass:: ginkgo_ai_client.queries.BoltzStructurePredictionResponse

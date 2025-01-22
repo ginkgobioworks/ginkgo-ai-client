@@ -46,19 +46,3 @@ Promoter activity with Promoter-0
 .. literalinclude:: ../../examples/promoter_activity.py
    :language: python
    :linenos:
-
-
-Boltz structure inference
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Structure inference with a simple (single-chain) protein sequence:
-
-.. literalinclude:: ../../examples/boltz_structure_inference/gfp.py
-   :language: python
-   :linenos:
-
-Structure inference with a multimer protein sequence and ligand(s):
-
-.. literalinclude:: ../../examples/boltz_structure_inference/with_ligand.py
-   :language: python
-   :linenos:

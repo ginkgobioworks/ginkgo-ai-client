@@ -8,7 +8,6 @@ from .queries import (
     PromoterActivityQuery,
     DiffusionMaskedQuery,
     DiffusionMaskedResponse,
-    BoltzStructurePredictionQuery,
 )
 
 __all__ = [

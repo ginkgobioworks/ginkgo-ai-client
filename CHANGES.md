@@ -9,6 +9,10 @@ and `Semantic versioning 2.0.0 <http://semver.org/>`\_, with the exceptions that
 - versions above `1.0.0` will be numbered as `major.minor.patch`, as is
   typical
 
+# Unreleased
+
+- Removed Boltz requests
+
 # 0.7.0 (2025-01-14)
 
 Add new query type `RNADiffusionMaskedQuery`
