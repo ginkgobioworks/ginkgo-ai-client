@@ -9,6 +9,16 @@ and `Semantic versioning 2.0.0 <http://semver.org/>`\_, with the exceptions that
 - versions above `1.0.0` will be numbered as `major.minor.patch`, as is
   typical
 
+
+# Unreleased
+
+Validation improvements:
+- Now all special tokens (<mask> etc) can be provided as upper or lower case and will be automatically lowercased.
+- DNA sequences can be both lower or uppercase (this is formatted server side). Protein sequences can only be uppercase
+- More tests
+- Better error messages
+
+
 # 0.8.0 (2025-01-22)
 
 - Removed Boltz requests
