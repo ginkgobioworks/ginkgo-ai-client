@@ -14,6 +14,25 @@ def test_that_forgetting_to_name_arguments_raises_the_better_error_message():
         MeanEmbeddingQuery("MLLK<mask>P", model="ginkgo-aa0-650M")
 
 
+def test_that_simple_query_creation_works():
+    MeanEmbeddingQuery(sequence="MLLKLP", model="ginkgo-aa0-650M")
+
+
+def test_that_uppercase_mask_is_accepted():
+    MeanEmbeddingQuery(sequence="MLLK<MASK>P", model="ginkgo-aa0-650M")
+
+
+def test_that_lowercase_protein_sequence_is_not_accepted():
+    expected_error_message = re.escape(
+        "Model ginkgo-aa0-650M requires the sequence to only contain the following "
+        "characters: ACDEFGHIKLMNPQRSTVWY and the extra tokens ['<mask>', '<unk>', "
+        "'<pad>', '<cls>', '<eos>'] (these can be upper-case). "
+        "The following unparsable characters were found: k"
+    )
+    with pytest.raises(ValueError, match=expected_error_message):
+        MeanEmbeddingQuery(sequence="MLLk<mask>P", model="ginkgo-aa0-650M")
+
+
 def test_promoter_activity_query_validation():
     with pytest.raises(ValueError):
         _query = PromoterActivityQuery(

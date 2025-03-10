@@ -27,6 +27,25 @@ def test_masked_inference(model, sequence, expected_sequence):
     assert results.sequence == expected_sequence
 
 
+def test_with_uppercase_mask():
+    client = GinkgoAIClient()
+    results = client.send_request(
+        MaskedInferenceQuery(
+            sequence="MCL<MASK>YAFVATDA<MASK>DDT", model="ginkgo-aa0-650M"
+        )
+    )
+    assert results.sequence == "MCLLYAFVATDADDDT"
+
+
+def test_that_unknown_tokens_are_accepted_and_not_unmasked():
+    client = GinkgoAIClient()
+    sequence = "MCL<unk>YAFVATDA<unk>DDT"
+    results = client.send_request(
+        MaskedInferenceQuery(sequence=sequence, model="ginkgo-aa0-650M")
+    )
+    assert results.sequence == "MCL<unk>YAFVATDA<unk>DDT"
+
+
 @pytest.mark.parametrize(
     "model, sequence, expected_length",
     [
