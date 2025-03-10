@@ -2,20 +2,15 @@
 
 from typing import Dict, Optional, Any, List, Literal, Union
 from abc import ABC, abstractmethod
-from pathlib import Path
 from functools import lru_cache
 import json
-import yaml
-import tempfile
 
 import pydantic
-import requests
 import pandas
 
 from ginkgo_ai_client.utils import (
     fasta_sequence_iterator,
     IteratorWithLength,
-    cif_to_pdb,
 )
 
 ## ---- Base classes --------------------------------------------------------------
@@ -48,7 +43,6 @@ class QueryBase(pydantic.BaseModel, ABC):
 
 
 class ResponseBase(pydantic.BaseModel):
-
     def write_to_jsonl(self, path: str):
         with open(path, "a") as f:
             f.write(self.model_dump_json() + "\n")
@@ -71,9 +65,18 @@ _maskedlm_models_properties_str = "\n".join(
     for model, sequence_type in _maskedlm_models_properties.items()
 )
 
+SPECIAL_TOKENS = ["<mask>", "<unk>", "<pad>", "<cls>", "<eos>"]
+
+
+def _lowercase_all_special_tokens(sequence: str) -> str:
+    """Lower-case all special tokens in a sequence."""
+    for special_token in SPECIAL_TOKENS:
+        sequence = sequence.replace(special_token.upper(), special_token)
+    return sequence
+
 
 def _validate_model_and_sequence(
-    model: str, sequence: str, allow_masks: bool = False, extra_chars: List[str] = []
+    model: str, sequence: str, allow_masks: bool = False, extra_tokens: List[str] = None
 ):
     """Raise an error if the model is unknown or the sequence isn't compatible.
 
@@ -92,21 +95,25 @@ def _validate_model_and_sequence(
     valid_models = list(_maskedlm_models_properties.keys())
     if model not in valid_models:
         raise ValueError(f"Model '{model}' unknown. Sould be one of {valid_models}")
+    extra_tokens = SPECIAL_TOKENS + (extra_tokens or [])
     sequence_type = _maskedlm_models_properties[model]
-    if allow_masks:
-        sequence = sequence.replace("<mask>", "")
-    chars = {
-        "dna": set("ATGC"),
-        "dna-iupac": set("ATGCNRSYWKMDHBV"),
-        "protein": set("ACDEFGHIKLMNPQRSTVWY"),
+
+    sequence_without_extra_tokens = sequence
+    for token in extra_tokens:
+        sequence_without_extra_tokens = sequence_without_extra_tokens.replace(token, "")
+
+    allowed_chars = {
+        "dna": set("ATGCatgc"),
+        "dna-iupac": set("ATGCNRSYWKMDHBVatgcnywkmdbvh"),
+        "protein": set("ACDEFGHIKLMNPQRSTVWY"),  # only uppercase allowed
     }[sequence_type]
-
-    chars = chars.union(set([e.upper() for e in extra_chars]))
-
-    if not set(sequence.upper()).issubset(chars):
+    unallowed_chars = set(sequence_without_extra_tokens) - allowed_chars
+    if unallowed_chars:
         raise ValueError(
             f"Model {model} requires the sequence to only contain "
-            f"the following characters (lower or upper-case): {''.join(chars)}"
+            f"the following characters: {''.join(sorted(allowed_chars))} "
+            f"and the extra tokens {extra_tokens} (these can be upper-case). "
+            f"The following unparsable characters were found: {''.join(sorted(unallowed_chars))}"
         )
 
 
@@ -166,8 +173,9 @@ class MeanEmbeddingQuery(QueryBase):
 
     @pydantic.model_validator(mode="after")
     def check_model_and_sequence_compatibility(cls, query):
+        query.sequence = _lowercase_all_special_tokens(query.sequence)
         sequence, model = query.sequence, query.model
-        _validate_model_and_sequence(model=model, sequence=sequence, allow_masks=False)
+        _validate_model_and_sequence(model=model, sequence=sequence)
         return query
 
     @classmethod
@@ -237,8 +245,9 @@ class MaskedInferenceQuery(QueryBase):
 
     @pydantic.model_validator(mode="after")
     def check_model_and_sequence_compatibility(cls, query):
+        query.sequence = _lowercase_all_special_tokens(query.sequence)
         sequence, model = query.sequence, query.model
-        _validate_model_and_sequence(model=model, sequence=sequence, allow_masks=True)
+        _validate_model_and_sequence(model=model, sequence=sequence)
         return query
 
 
@@ -525,7 +534,6 @@ class RNADiffusionMaskedQuery(QueryBase):
     query_name: Optional[str] = None
 
     def to_request_params(self) -> Dict:
-
         data = {
             "three_utr": self.three_utr,
             "five_utr": self.five_utr,
@@ -572,12 +580,18 @@ class RNADiffusionMaskedQuery(QueryBase):
 
     @pydantic.model_validator(mode="after")
     def validate_query(cls, query):
-
-        _validate_model_and_sequence(query.model, query.three_utr, allow_masks=True)
-        _validate_model_and_sequence(query.model, query.five_utr, allow_masks=True)
+        query.three_utr = _lowercase_all_special_tokens(query.three_utr)
+        query.five_utr = _lowercase_all_special_tokens(query.five_utr)
+        query.protein_sequence = _lowercase_all_special_tokens(query.protein_sequence)
+        _validate_model_and_sequence(query.model, query.three_utr)
+        _validate_model_and_sequence(query.model, query.five_utr)
         # extra char for "-" that denotes end of the protein sequence
+        if "<mask>" in query.protein_sequence:
+            raise ValueError(
+                "protein_sequence cannot contain <mask> in the RNA diffusion  model."
+            )
         _validate_model_and_sequence(
-            "esm2-650M", query.protein_sequence, allow_masks=False, extra_chars=["-"]
+            "esm2-650M", query.protein_sequence, extra_tokens=["-"]
         )
 
         if query.species not in cls.get_species_dataframe().Species.tolist():
@@ -679,7 +693,6 @@ class DiffusionMaskedQuery(QueryBase):
         _validate_model_and_sequence(
             model=model,
             sequence=sequence,
-            allow_masks=True,
         )
         # Validate temperature
         if not 0 <= query.temperature <= 1:
