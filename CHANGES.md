@@ -10,7 +10,7 @@ and `Semantic versioning 2.0.0 <http://semver.org/>`\_, with the exceptions that
   typical
 
 
-# Unreleased
+# 0.9.0 (2025-03-10)
 
 Validation improvements:
 - Now all special tokens (<mask> etc) can be provided as upper or lower case and will be automatically lowercased.
